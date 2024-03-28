@@ -5,6 +5,7 @@ import 'home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'globals.dart';
+import 'signup_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginPage extends StatelessWidget {
@@ -14,12 +15,13 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Login"), backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
-      body: const Column(children: [
+      body: Column(children: [
         Padding(
           padding: EdgeInsets.all(8.0),
           child: Center(child: SizedBox(height: 150, width: 150,child: Placeholder(),)),
         ),
-        LoginPageForm()
+        LoginPageForm(),
+        OutlinedButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage())), child: Text("Make an account"))
       ],),
     );
   }
@@ -36,6 +38,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
 
   Future tryLogIn() async {
     const storage = FlutterSecureStorage();
+    // ignore: non_constant_identifier_names
     final String? pb_auth = await storage.read(key: "pb_auth");
     if (pb_auth != null) {
       final decoded = jsonDecode(pb_auth);
@@ -44,8 +47,24 @@ class _LoginPageFormState extends State<LoginPageForm> {
         decoded["model"] as Map<String, dynamic>? ?? {});
       pb.authStore.save(token, model);
       if (!mounted) return;
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
+      Navigator.pushAndRemoveUntil(context, _createRoute(), (route) => false);
     }
+  }
+
+  Route _createRoute() {
+    return PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 200),
+      pageBuilder: (context, animation, secondaryAnimation) => const HomePage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+  const end = Offset.zero;
+  var curve = Curves.easeOutCubic;
+  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween), child: child,);
+      }
+      );
   }
 
 
@@ -94,7 +113,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             loading = true;
           });
           try{
-            final authData = await pb.collection('users').authWithPassword(
+            await pb.collection('users').authWithPassword(
            email, password,
           );
 
@@ -105,6 +124,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
               "model": pb.authStore.model,
             });
             await storage.write(key: "pb_auth", value: encoded);
+            if (!mounted) return;
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
 
 
@@ -115,6 +135,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             builder: (context) => AlertDialog(
               title: Text("Something went wrong :/"),
               content: Text(e.toString()),
+              actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text("OK"))],
             ));
 
             
