@@ -14,7 +14,7 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         colorSchemeSeed: Colors.blue
       ),
-      home: LoginPage()
+      home: const LoginPage()
     );
   }
 }
