@@ -1,5 +1,5 @@
 import 'package:shc_cricket_bookings/login_page.dart';
-
+import 'account_page.dart';
 import 'globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
           const FlutterSecureStorage().delete(key: "pb_auth");
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
         }, child: const Text("Log out")),
-        TextButton(onPressed: () async {
+        TextButton(onPressed: () async {  
           final verified = await pb.collection('users').getOne(
             pb.authStore.model.id,
             fields: "verified"
@@ -65,12 +65,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      actions: [IconButton(icon: const Icon(Icons.logout_outlined),
-      onPressed: () async { 
-        pb.authStore.clear();
-        await const FlutterSecureStorage().delete(key: "pb_auth");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const LoginPage()), (route) => false);
-        },)],),
+      title: Placeholder(fallbackHeight: 40, fallbackWidth: 200,),
+      actions: [
+        IconButton(icon: Icon(Icons.account_circle_outlined), onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage()));
+
+        },)
+        
+        
+        ],),
 
     );
   }
