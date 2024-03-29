@@ -38,84 +38,88 @@ class _SignupPageFormState extends State<SignupPageForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            decoration: const InputDecoration(filled: true,
-            hintText: "Use your SHC email if you have one",
-            prefixIcon: Icon(Icons.email_outlined),
-            border: OutlineInputBorder(),
-            label: Text("Email")
+    return AutofillGroup(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              autofillHints: [AutofillHints.email],
+              decoration: const InputDecoration(filled: true,
+              hintText: "Use your SHC email if you have one",
+              prefixIcon: Icon(Icons.email_outlined),
+              border: OutlineInputBorder(),
+              label: Text("Email")
+              ),
+              onChanged: (value) => email = value,
             ),
-            onChanged: (value) => email = value,
           ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            obscureText: true,
-            decoration: const InputDecoration(filled: true,
-            prefixIcon: Icon(Icons.password_outlined),
-            border: OutlineInputBorder(),
-            label: Text("Password")
+      
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              autofillHints: [AutofillHints.password],
+              obscureText: true,
+              decoration: const InputDecoration(filled: true,
+              prefixIcon: Icon(Icons.password_outlined),
+              border: OutlineInputBorder(),
+              label: Text("Password")
+              ),
+              onChanged: (value) { password = value;}
             ),
-            onChanged: (value) => password = value,
           ),
-        ),
-
-        FilledButton.tonal(onPressed: () async {
-
-          setState(() {
-            loading = true;
-          });
-          try{
-            await pb.collection('users').create(body: 
-            {
-              "email": email,
-              "password": password,
-              "passwordConfirm": password,
-              "emailVisibility": true,
-              "permissions": "bio1uv9wg3ibr00"
+      
+          FilledButton.tonal(onPressed: () async {
+      
+            setState(() {
+              loading = true;
             });
-
-            await pb.collection('users').authWithPassword(email, password);
-
-          const storage = FlutterSecureStorage();
-
-            final encoded = jsonEncode(<String, dynamic>{
-              "token": pb.authStore.token,
-              "model": pb.authStore.model,
-            });
-            await storage.write(key: "pb_auth", value: encoded);
-            Navigator.push(context, MaterialPageRoute(builder: (context)=> VerifyEmailPage(email: email)),);
-
-
-          } catch (e) {
-            setState(()=> loading = false);
-            if (!mounted) return;
-            showDialog(context: context, 
-            builder: (context) => AlertDialog(
-              title: const Text("Something went wrong :/"),
-              content: Text(e.toString()),
-              actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: const Text("OK"))],
-            ));
-
+            try{
+              await pb.collection('users').create(body: 
+              {
+                "email": email,
+                "password": password,
+                "passwordConfirm": password,
+                "emailVisibility": true,
+                "permissions": "bio1uv9wg3ibr00"
+              });
+      
+              await pb.collection('users').authWithPassword(email, password);
+      
+            const storage = FlutterSecureStorage();
+      
+              final encoded = jsonEncode(<String, dynamic>{
+                "token": pb.authStore.token,
+                "model": pb.authStore.model,
+              });
+              await storage.write(key: "pb_auth", value: encoded);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> VerifyEmailPage(email: email)),);
+      
+      
+            } catch (e) {
+              setState(()=> loading = false);
+              if (!mounted) return;
+              showDialog(context: context, 
+              builder: (context) => AlertDialog(
+                title: const Text("Something went wrong :/"),
+                content: Text(e.toString()),
+                actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: const Text("OK"))],
+              ));
+      
+              
+            }
             
-          }
-          
-
-          }, 
-          child: loading? const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(),
-          ): const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("Sign up"),
-          ))
-      ],
+      
+            }, 
+            child: loading? const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(),
+            ): const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Sign up"),
+            ))
+        ],
+      ),
     );
   }
 }

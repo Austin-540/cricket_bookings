@@ -84,28 +84,51 @@ class _LoginPageFormState extends State<LoginPageForm> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            decoration: InputDecoration(filled: true,
-            prefixIcon: Icon(Icons.person_outline),
-            border: OutlineInputBorder(),
-            label: Text("Email")
+          child: Form(
+            child: AutofillGroup(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      autofillHints: [
+                        AutofillHints.email,
+                        AutofillHints.username
+                      ],
+                      decoration: InputDecoration(filled: true,
+                      prefixIcon: Icon(Icons.person_outline),
+                      border: OutlineInputBorder(),
+                      label: Text("Email")
+                      ),
+                      onChanged: (value) => email = value,
+                    ),
+                  ),
+              
+                  Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              autofillHints: [
+                                AutofillHints.password,
+                              ],
+                              obscureText: true,
+                              decoration: InputDecoration(filled: true,
+                              prefixIcon: Icon(Icons.password_outlined),
+                              border: OutlineInputBorder(),
+                              label: Text("Password")
+                              ),
+                              onChanged: (value) => password = value,
+                            ),
+                          ),
+              
+                ],
+              ),
             ),
-            onChanged: (value) => email = value,
           ),
+
+
         ),
 
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            obscureText: true,
-            decoration: InputDecoration(filled: true,
-            prefixIcon: Icon(Icons.password_outlined),
-            border: OutlineInputBorder(),
-            label: Text("Password")
-            ),
-            onChanged: (value) => password = value,
-          ),
-        ),
+        
 
         FilledButton.tonal(onPressed: () async {
 
@@ -125,7 +148,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             });
             await storage.write(key: "pb_auth", value: encoded);
             if (!mounted) return;
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomePage()));
 
 
           } catch (e) {
