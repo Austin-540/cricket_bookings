@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shc_cricket_bookings/signup_page.dart';
 import 'globals.dart';
 import 'home_page.dart';
 
@@ -23,6 +24,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(icon: Icon(Icons.arrow_back_outlined), onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignupPage())),),
         title: const Text("Verify your email"),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
@@ -55,7 +57,7 @@ class TellToVerifyEmail extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Text("Please click the link sent to $email"),
+            Center(child: Text("Please click the link sent to\n$email", textAlign: TextAlign.center,)),
             ElevatedButton(onPressed: () async {
         
             final record = await pb.collection('users').getOne(pb.authStore.model.id, fields: "verified");
