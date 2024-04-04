@@ -13,7 +13,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future checkVerified() async {
-  final record = await pb.collection('users').getOne(pb.authStore.model.id,
+    try{
+      final record = await pb.collection('users').getOne(pb.authStore.model.id,
   fields: "email, verified"
 );
 
@@ -51,6 +52,18 @@ class _HomePageState extends State<HomePage> {
      ));
 
   }
+    } catch(e) {
+      showDialog(context: context, builder: (context) => AlertDialog(
+        title: Text("Something went wrong logging in"),
+        content: Text("${e.toString()}\n\nYou can either log out or try refreshing"),
+        actions: [TextButton(onPressed: () {
+          pb.authStore.clear();
+        FlutterSecureStorage().delete(key: "pb_auth");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+        }, child: Text("Log Out"))],
+      ));
+    }
+  
 
   }
 
