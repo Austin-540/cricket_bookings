@@ -131,6 +131,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
         
 
         FilledButton.tonal(onPressed: () async {
+          if (email == "" || password == "") return;
 
           setState(() {
             loading = true;

@@ -70,6 +70,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
           ),
       
           FilledButton.tonal(onPressed: () async {
+            if (email == "" || password == "") return;
       
             setState(() {
               loading = true;
