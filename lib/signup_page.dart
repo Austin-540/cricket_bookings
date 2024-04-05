@@ -35,53 +35,8 @@ class SignupPageForm extends StatefulWidget {
 }
 
 class _SignupPageFormState extends State<SignupPageForm> {
-  String email = "";
-  String password = "";
-  bool loading = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return AutofillGroup(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              autofillHints: [AutofillHints.email],
-              decoration: const InputDecoration(filled: true,
-              hintText: "Use your SHC email if you have one",
-              prefixIcon: Icon(Icons.email_outlined),
-              border: OutlineInputBorder(),
-              label: Text("Email")
-              ),
-              onChanged: (value) => email = value,
-            ),
-          ),
-      
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: TextField(
-          //     autofillHints: [AutofillHints.password],
-          //     obscureText: true,
-          //     decoration: const InputDecoration(filled: true,
-          //     prefixIcon: Icon(Icons.password_outlined),
-          //     border: OutlineInputBorder(),
-          //     label: Text("Password")
-          //     ),
-          //     onChanged: (value) { password = value;}
-          //   ),
-          // ),
-      
-          FilledButton.tonal(onPressed: () async {
-            final username = email.replaceAll(RegExp(r"@"), "__at__"); //double underscores
-            // if (email == "" || password == "") return;
-            //temporarily disabled for passkey stuff
-      
-            setState(() {
-              loading = true;
-            });
-            try{
-              final passkeyAuthenticator = PasskeyAuthenticator();
+  Future attemptMakePasskey(username) async {
+    final passkeyAuthenticator = PasskeyAuthenticator();
                   // initiate sign up by calling the relying party server
                   final webAuthnChallenge = await pb.send("/webauthn-begin-registration/${base64.encode(utf8.encode(username))}", method: "POST");
                   // call the platform authenticator to register a new passkey on the device
@@ -129,17 +84,74 @@ class _SignupPageFormState extends State<SignupPageForm> {
               content: Text("You will now be taken to the login screen. Enter your email then click login with passkey."),
               actions: [TextButton(onPressed: (){Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> LoginPage()), (route) => false);}, child: Text("OK"))],
             ));
-              
+  }
+  String email = "";
+  String password = "";
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AutofillGroup(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              autofillHints: [AutofillHints.email],
+              decoration: const InputDecoration(filled: true,
+              hintText: "Use your SHC email if you have one",
+              prefixIcon: Icon(Icons.email_outlined),
+              border: OutlineInputBorder(),
+              label: Text("Email")
+              ),
+              onChanged: (value) => email = value,
+            ),
+          ),
       
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: TextField(
+          //     autofillHints: [AutofillHints.password],
+          //     obscureText: true,
+          //     decoration: const InputDecoration(filled: true,
+          //     prefixIcon: Icon(Icons.password_outlined),
+          //     border: OutlineInputBorder(),
+          //     label: Text("Password")
+          //     ),
+          //     onChanged: (value) { password = value;}
+          //   ),
+          // ),
       
+          FilledButton.tonal(onPressed: () async {
+            final username = email.replaceAll(RegExp(r"@"), "__at__"); //double underscores
+            // if (email == "" || password == "") return;
+            //temporarily disabled for passkey stuff
+      
+            setState(() {
+              loading = true;
+            });
+            try{
+              await attemptMakePasskey(username);
             } catch (e) {
               setState(()=> loading = false);
               if (!mounted) return;
               showDialog(context: context, 
               builder: (context) => AlertDialog(
-                title: const Text("Something went wrong :/"),
-                content: Text(e.toString()),
-                actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: const Text("OK"))],
+                title: const Text("Something went wrong creating your passkey :/"),
+                content: Text("${e.toString()}\n\nYou can either try again or use a password."),
+                actions: [TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(username: username, email: email,)), (route) => false), child: Text("Set a password")),
+                  TextButton(onPressed: ()async {
+                  try {
+                    await attemptMakePasskey(username);
+                  } catch (e) {
+                    showDialog(context: context, builder: (context) => 
+                    AlertDialog(title: Text("That didn't work again :/",),
+                    content: Text("You will need to make a password. If you pressed cancel when asked to make a passkey, you won't be able to recieve the popup again."),
+                    actions: [
+                      TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false), child: Text("OK"))
+                    ],));
+                  }
+                  }, child: const Text("Try again"))],
               ));
       
               
@@ -156,6 +168,65 @@ class _SignupPageFormState extends State<SignupPageForm> {
             ))
         ],
       ),
+    );
+  }
+}
+
+class SetPasswordPage extends StatefulWidget {
+  const SetPasswordPage({super.key, required this.username, required this.email});
+    final username;
+  final email;
+
+  @override
+  State<SetPasswordPage> createState() => _SetPasswordPageState();
+}
+
+class _SetPasswordPageState extends State<SetPasswordPage> {
+  String password = "";
+  
+
+  @override
+  Widget build(BuildContext context) {
+    String username = "${widget.username}__noPasskey";
+    return Scaffold(
+      appBar: AppBar(title: Text("Set password"),
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(onChanged: (value)=>password = value,
+          decoration: InputDecoration(filled: true,
+          prefixIcon: Icon(Icons.password_outlined),
+          border: OutlineInputBorder(),
+          label: Text("Password"))),
+        ),
+
+        FilledButton.tonal(onPressed: ()async{
+          try{
+await pb.collection('users').create(
+          body: {
+            "username": username,
+            "email": widget.email,
+            "emailVisibility": true,
+            "password": password,
+            "passwordConfirm": password,
+          });
+          showDialog(context: context, builder: (context) => AlertDialog(title: Text("Successfully set password"),
+          content: Text("Your password has been set. You will now need to login with your new account details."),
+          actions: [
+            TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false), child: Text("Login Page"))
+          ],));
+          } catch (e) {
+            showDialog(context: context, builder: (context)=> AlertDialog(
+              title: Text("Something went wrong :/"),
+              content: Text(e.toString()),
+            ));
+          }
+          
+          
+        }, child: Text("Set password"))
+        
+      ],),
     );
   }
 }
