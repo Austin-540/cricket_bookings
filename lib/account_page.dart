@@ -12,6 +12,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  
   Future accountData = pb.collection('users').getOne(pb.authStore.model.id,
   expand: 'permissions',
 );

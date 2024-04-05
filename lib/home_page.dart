@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:shc_cricket_bookings/login_page.dart';
 import 'account_page.dart';
 import 'globals.dart';
+import 'package:pocketbase/pocketbase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -12,8 +15,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  Future setupPBAuth() async {
+    final String? pb_auth = await FlutterSecureStorage().read(key: "pb_auth");
+    if (pb_auth != null) {
+      final decoded = jsonDecode(pb_auth);
+      final token = (decoded as Map<String, dynamic>)["token"] as String? ?? "";
+      final model = RecordModel.fromJson(
+        decoded["model"] as Map<String, dynamic>? ?? {});
+      pb.authStore.save(token, model);}
+  }
   Future checkVerified() async {
     try{
+      final pbAuthModel = pb.authStore.model;
+      print(pb.authStore.model.toString());
       final record = await pb.collection('users').getOne(pb.authStore.model.id,
   fields: "email, verified"
 );
@@ -70,6 +85,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    setupPBAuth();
     checkVerified();
   }
 

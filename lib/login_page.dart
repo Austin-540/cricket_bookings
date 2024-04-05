@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:pocketbase/pocketbase.dart';
+import 'package:passkeys/authenticator.dart';
+import 'package:passkeys/types.dart';
 import 'globals.dart';
 import 'signup_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -114,7 +116,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
                               decoration: InputDecoration(filled: true,
                               prefixIcon: Icon(Icons.password_outlined),
                               border: OutlineInputBorder(),
-                              label: Text("Password")
+                              label: Text("Password (not required with a passkey)")
                               ),
                               onChanged: (value) => password = value,
                             ),
@@ -173,7 +175,52 @@ class _LoginPageFormState extends State<LoginPageForm> {
           ): Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text("Login"),
-          ))
+          )),
+          Text("OR"),
+          FilledButton.tonal(onPressed: () async{
+            final username = email.replaceAll(RegExp(r"@"), "__at__");
+                              final passkeyAuthenticator = PasskeyAuthenticator();
+                  final webAuthnChallenge = await pb.send("/webauthn-begin-login/${base64.encode(utf8.encode(username))}", method: "POST");
+                  final platformRes = await passkeyAuthenticator.authenticate(
+                    AuthenticateRequestType(
+                    relyingPartyId: webAuthnChallenge['publicKey']['rpId'], 
+                    challenge: webAuthnChallenge['publicKey']['challenge'], 
+                    timeout: webAuthnChallenge['publicKey']['timeout'], 
+                    userVerification: webAuthnChallenge['publicKey']['userVerification'], 
+                    allowCredentials: [CredentialType(
+                      type: webAuthnChallenge['publicKey']['allowCredentials'][0]['type'], 
+                      id: webAuthnChallenge['publicKey']['allowCredentials'][0]['id'], 
+                      transports: []
+                      )], 
+                    mediation: MediationType.Optional));
+                  final res = await pb.send("/webauthn-finish-login/${base64.encode(utf8.encode(username))}", method: "POST", 
+                  body: {
+                    "type": "public-key",
+                    "authenticatorAttachment": "cross-platform",
+                    "clientExtensionResults": {},
+                    "id": platformRes.userHandle,
+                    "rawId": platformRes.rawId,
+                    "response": {
+                      "authenticatorData": platformRes.authenticatorData,
+                      "clientDataJSON": platformRes.clientDataJSON,
+                      "signature": platformRes.signature,
+                      "userHandle": platformRes.userHandle
+                    }
+                    
+                    
+                  }
+                  );
+                  print(res);
+                  final storage = FlutterSecureStorage();
+                  pb.authStore.save(res['token'], res['user']);
+                  final encoded = jsonEncode(<String, dynamic>{
+              "token": pb.authStore.token,
+              "model": pb.authStore.model,
+            });
+            await storage.write(key: "pb_auth", value: encoded);
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
+
+          }, child: Text("Login with a passkey"))
       ],
     );
   }
