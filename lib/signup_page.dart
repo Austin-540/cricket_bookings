@@ -45,13 +45,14 @@ class _SignupPageFormState extends State<SignupPageForm> {
                     relyingParty: RelyingPartyType(id: webAuthnChallenge['publicKey']['rp']['id'], name: webAuthnChallenge['publicKey']['rp']['name']),
                  user: UserType(displayName: webAuthnChallenge['publicKey']['user']['displayName'], id: webAuthnChallenge['publicKey']['user']['id'], name: webAuthnChallenge['publicKey']['user']['name']),
                     authSelectionType: AuthenticatorSelectionType(
-                      requireResidentKey: webAuthnChallenge['publicKey']['authenticatorSelection']['requireResidentKey'],
+                      requireResidentKey: true,
                       userVerification: "preferred",
                       residentKey: "preferred",
-                      authenticatorAttachment: "platform",
+                      authenticatorAttachment: "",
                     ),
                     pubKeyCredParams: [
-                      PubKeyCredParamType(type: "public-key", alg: -7)], 
+                      PubKeyCredParamType(type: "public-key", alg: -7),
+                      PubKeyCredParamType(type: "public-key", alg: -257)], 
                     timeout: webAuthnChallenge['publicKey']['timeout'],  excludeCredentials: [],
                     attestation: null));
                   // finish sign up by calling the relying party server again
@@ -77,6 +78,8 @@ class _SignupPageFormState extends State<SignupPageForm> {
             //     "model": pb.authStore.model,
             //   });
             //   await storage.write(key: "pb_auth", value: encoded);
+            
+
             showDialog(
               barrierDismissible: false,
               context: context, builder: (context) => AlertDialog(
@@ -139,7 +142,12 @@ class _SignupPageFormState extends State<SignupPageForm> {
               builder: (context) => AlertDialog(
                 title: const Text("Something went wrong creating your passkey :/"),
                 content: Text("${e.toString()}\n\nYou can either try again or use a password."),
-                actions: [TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(username: username, email: email,)), (route) => false), child: Text("Set a password")),
+                actions: [TextButton(onPressed: ()async{
+                   try{
+                            await pb.send("/api/shc/delete_account_after_passkey_failed/${username}");
+                        } finally{
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
+                        }}, child: Text("Set a password")),
                   TextButton(onPressed: ()async {
                   try {
                     await attemptMakePasskey(username);
@@ -148,7 +156,14 @@ class _SignupPageFormState extends State<SignupPageForm> {
                     AlertDialog(title: Text("That didn't work again :/",),
                     content: Text("You will need to make a password. If you pressed cancel when asked to make a passkey, you won't be able to recieve the popup again."),
                     actions: [
-                      TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false), child: Text("OK"))
+                      TextButton(onPressed: ()async{
+                        try{
+                            await pb.send("/api/shc/delete_account_after_passkey_failed/${username}");
+                        } finally{
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
+                        }
+                        
+                        }, child: Text("OK"))
                     ],));
                   }
                   }, child: const Text("Try again"))],
