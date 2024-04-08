@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:shc_cricket_bookings/login_page.dart';
-import 'package:shc_cricket_bookings/verify_email_page.dart';
 import 'package:passkeys/authenticator.dart';
+import 'package:web_browser_detect/web_browser_detect.dart';
 import 'package:passkeys/types.dart';
 
 import 'globals.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'home_page.dart';
 
 class SignupPage extends StatelessWidget {
@@ -35,8 +35,19 @@ class SignupPageForm extends StatefulWidget {
 }
 
 class _SignupPageFormState extends State<SignupPageForm> {
-  Future attemptMakePasskey(username) async {
+  Future attemptMakePasskey(username, bool useCrossPlatform) async {
+    final browser = Browser.detectOrNull();
+
+    String attachment;
+    if (browser?.browser == "Safari" || useCrossPlatform) {
+      attachment = "cross-platform";
+    } else {
+      attachment = "";
+    }
+
+
     final passkeyAuthenticator = PasskeyAuthenticator();
+
                   // initiate sign up by calling the relying party server
                   final webAuthnChallenge = await pb.send("/webauthn-begin-registration/${base64.encode(utf8.encode(username))}", method: "POST");
                   // call the platform authenticator to register a new passkey on the device
@@ -48,13 +59,13 @@ class _SignupPageFormState extends State<SignupPageForm> {
                       requireResidentKey: true,
                       userVerification: "preferred",
                       residentKey: "preferred",
-                      authenticatorAttachment: "",
+                      authenticatorAttachment: attachment,
                     ),
                     pubKeyCredParams: [
                       PubKeyCredParamType(type: "public-key", alg: -7),
                       PubKeyCredParamType(type: "public-key", alg: -257)], 
                     timeout: webAuthnChallenge['publicKey']['timeout'],  excludeCredentials: [],
-                    attestation: null));
+                    attestation: "none"));
                   // finish sign up by calling the relying party server again
                   final relyingPartyServerRes = await pb.send(
                     "/webauthn-finish-registration/${base64.encode(utf8.encode(username))}", method: "POST", body: {
@@ -93,6 +104,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
   String email = "";
   String password = "";
   bool loading = false;
+  bool dontShowErrorBecauseSafari = false;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +140,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
           // ),
       
           FilledButton.tonal(onPressed: () async {
-            final username = email.replaceAll(RegExp(r"@"), "__at__"); //double underscores
+            final username = email.replaceFirst(RegExp(r"@"), "__at__"); //double underscores
             // if (email == "" || password == "") return;
             //temporarily disabled for passkey stuff
       
@@ -136,36 +148,43 @@ class _SignupPageFormState extends State<SignupPageForm> {
               loading = true;
             });
             try{
-              await attemptMakePasskey(username);
+              await attemptMakePasskey(username, false);
             } catch (e) {
+                      final browser = Browser.detectOrNull();
+                      if (browser?.browser == "Safari") {
+                        try{
+                        await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
+                      } catch (_) {}
+                      }
+                    
+              try{
+              await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
+              } catch (_) {}
               setState(()=> loading = false);
               if (!context.mounted) return;
+              if (dontShowErrorBecauseSafari) return;
               showDialog(context: context, 
               builder: (context) => AlertDialog(
                 title: const Text("Something went wrong creating your passkey :/"),
                 content: Text("${e.toString()}\n\nYou can either try again or use a password. If you do not create a passkey now, you will only be able to use a password to login."),
                 actions: [TextButton(onPressed: ()async{
-                   try{
-                            await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
-                        } finally{
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
-                        }}, child: const Text("Set a password")),
+                        }, child: const Text("Set a password")),
                   TextButton(onPressed: ()async {
                   try {
-                    await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
-                    await attemptMakePasskey(username);
+                    await attemptMakePasskey(username, true);
                   } catch (e) {
+                    try {
+                    await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
+                    } catch (_){}
                     if (!context.mounted) return;
                     showDialog(context: context, builder: (context) => 
                     AlertDialog(title: const Text("That didn't work again :/",),
                     content: const Text("You will need to make a password."),
                     actions: [
                       TextButton(onPressed: ()async{
-                        try{
-                            await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
-                        } finally{
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
-                        }
+                        
                         
                         }, child: const Text("OK"))
                     ],));
@@ -184,7 +203,12 @@ class _SignupPageFormState extends State<SignupPageForm> {
             ): const Padding(
               padding: EdgeInsets.all(8.0),
               child: Text("Sign up"),
-            ))
+            )),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Text("It is recommended that you save your passkey to your phone so that you can login on all your devices.",
+              textAlign: TextAlign.center,),
+            )
         ],
       ),
     );
@@ -202,6 +226,7 @@ class SetPasswordPage extends StatefulWidget {
 
 class _SetPasswordPageState extends State<SetPasswordPage> {
   String password = "";
+  bool loading = false;
   
 
   @override
@@ -221,6 +246,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
         ),
 
         FilledButton.tonal(onPressed: ()async{
+          loading = true;
           try{
 await pb.collection('users').create(
           body: {
@@ -236,6 +262,7 @@ await pb.collection('users').create(
             TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: widget.email,)), (route) => false), child: const Text("Login Page"))
           ],));
           } catch (e) {
+            loading = false;
             showDialog(context: context, builder: (context)=> AlertDialog(
               title: const Text("Something went wrong :/"),
               content: Text(e.toString()),
@@ -243,7 +270,7 @@ await pb.collection('users').create(
           }
           
           
-        }, child: const Text("Set password"))
+        }, child: loading? const CircularProgressIndicator():const Text("Set password"))
         
       ],),
     );
