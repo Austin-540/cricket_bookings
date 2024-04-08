@@ -52,12 +52,14 @@ class _LoginPageFormState extends State<LoginPageForm> {
                     relyingPartyId: webAuthnChallenge['publicKey']['rpId'], 
                     challenge: webAuthnChallenge['publicKey']['challenge'], 
                     timeout: webAuthnChallenge['publicKey']['timeout'], 
-                    userVerification: webAuthnChallenge['publicKey']['userVerification'], 
-                    allowCredentials: [CredentialType(
+                    userVerification: "preferred", 
+                    allowCredentials: [
+                      CredentialType(
                       type: webAuthnChallenge['publicKey']['allowCredentials'][0]['type'], 
                       id: webAuthnChallenge['publicKey']['allowCredentials'][0]['id'], 
                       transports: []
-                      )], 
+                      )
+                      ], 
                     mediation: MediationType.Optional));
                   final res = await pb.send("/webauthn-finish-login/${base64.encode(utf8.encode(username))}", method: "POST", 
                   body: {
@@ -91,6 +93,9 @@ class _LoginPageFormState extends State<LoginPageForm> {
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
           } 
           catch (e) {
+            setState(() {
+            loading = false;
+            });
             if (!mounted) return;
             showDialog(context: context, builder: (context) => AlertDialog(
               title: Text("Something went wrong :/"),

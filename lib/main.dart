@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MainApp());
 }
 
@@ -14,7 +15,7 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         colorSchemeSeed: Colors.blue
       ),
-      home: const LoginPage()
+      home: const LoginPage(defaultEmail: null,)
     );
   }
 }
