@@ -78,14 +78,16 @@ class _SignupPageFormState extends State<SignupPageForm> {
             //     "model": pb.authStore.model,
             //   });
             //   await storage.write(key: "pb_auth", value: encoded);
+
+            if (!mounted) return;
             
 
             showDialog(
               barrierDismissible: false,
               context: context, builder: (context) => AlertDialog(
-              title: Text("You successfully made a passkey :)"),
-              content: Text("You will now be taken to the login screen. Enter your email then click login with passkey."),
-              actions: [TextButton(onPressed: (){Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> LoginPage()), (route) => false);}, child: Text("OK"))],
+              title: const Text("You successfully made a passkey :)"),
+              content: const Text("You will now be taken to the login screen. Click login to use your passkey."),
+              actions: [TextButton(onPressed: (){Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> LoginPage(defaultEmail: email,)), (route) => false);}, child: const Text("OK"))],
             ));
   }
   String email = "";
@@ -100,7 +102,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              autofillHints: [AutofillHints.email],
+              autofillHints: const [AutofillHints.email],
               decoration: const InputDecoration(filled: true,
               hintText: "Use your SHC email if you have one",
               prefixIcon: Icon(Icons.email_outlined),
@@ -137,33 +139,35 @@ class _SignupPageFormState extends State<SignupPageForm> {
               await attemptMakePasskey(username);
             } catch (e) {
               setState(()=> loading = false);
-              if (!mounted) return;
+              if (!context.mounted) return;
               showDialog(context: context, 
               builder: (context) => AlertDialog(
                 title: const Text("Something went wrong creating your passkey :/"),
-                content: Text("${e.toString()}\n\nYou can either try again or use a password."),
+                content: Text("${e.toString()}\n\nYou can either try again or use a password. If you do not create a passkey now, you will only be able to use a password to login."),
                 actions: [TextButton(onPressed: ()async{
                    try{
-                            await pb.send("/api/shc/delete_account_after_passkey_failed/${username}");
+                            await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
                         } finally{
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
-                        }}, child: Text("Set a password")),
+                        }}, child: const Text("Set a password")),
                   TextButton(onPressed: ()async {
                   try {
+                    await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
                     await attemptMakePasskey(username);
                   } catch (e) {
+                    if (!context.mounted) return;
                     showDialog(context: context, builder: (context) => 
-                    AlertDialog(title: Text("That didn't work again :/",),
-                    content: Text("You will need to make a password. If you pressed cancel when asked to make a passkey, you won't be able to recieve the popup again."),
+                    AlertDialog(title: const Text("That didn't work again :/",),
+                    content: const Text("You will need to make a password."),
                     actions: [
                       TextButton(onPressed: ()async{
                         try{
-                            await pb.send("/api/shc/delete_account_after_passkey_failed/${username}");
+                            await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
                         } finally{
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
                         }
                         
-                        }, child: Text("OK"))
+                        }, child: const Text("OK"))
                     ],));
                   }
                   }, child: const Text("Try again"))],
@@ -204,13 +208,13 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
   Widget build(BuildContext context) {
     String username = "${widget.username}__noPasskey";
     return Scaffold(
-      appBar: AppBar(title: Text("Set password"),
+      appBar: AppBar(title: const Text("Set password"),
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
       body: Column(children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: TextField(onChanged: (value)=>password = value,
-          decoration: InputDecoration(filled: true,
+          decoration: const InputDecoration(filled: true,
           prefixIcon: Icon(Icons.password_outlined),
           border: OutlineInputBorder(),
           label: Text("Password"))),
@@ -226,20 +230,20 @@ await pb.collection('users').create(
             "password": password,
             "passwordConfirm": password,
           });
-          showDialog(context: context, builder: (context) => AlertDialog(title: Text("Successfully set password"),
-          content: Text("Your password has been set. You will now need to login with your new account details."),
+          showDialog(context: context, builder: (context) => AlertDialog(title: const Text("Successfully set password"),
+          content: const Text("Your password has been set. You will now need to login with your new account details."),
           actions: [
-            TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false), child: Text("Login Page"))
+            TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: widget.email,)), (route) => false), child: const Text("Login Page"))
           ],));
           } catch (e) {
             showDialog(context: context, builder: (context)=> AlertDialog(
-              title: Text("Something went wrong :/"),
+              title: const Text("Something went wrong :/"),
               content: Text(e.toString()),
             ));
           }
           
           
-        }, child: Text("Set password"))
+        }, child: const Text("Set password"))
         
       ],),
     );

@@ -15,9 +15,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  
 
   Future setupPBAuth() async {
-    final String? pb_auth = await FlutterSecureStorage().read(key: "pb_auth");
+    final String? pb_auth = await const FlutterSecureStorage().read(key: "pb_auth");
     if (pb_auth != null) {
       final decoded = jsonDecode(pb_auth);
       final token = (decoded as Map<String, dynamic>)["token"] as String? ?? "";
@@ -26,6 +27,7 @@ class _HomePageState extends State<HomePage> {
       pb.authStore.save(token, model);}
   }
   Future checkVerified() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     try{
       final pbAuthModel = pb.authStore.model;
       print(pb.authStore.model.toString());
@@ -35,6 +37,7 @@ class _HomePageState extends State<HomePage> {
 
   if (!record.data['verified']){
     await pb.collection('users').requestVerification(record.data['email']);
+    if (!mounted) return;
     showDialog(context: context,
     barrierDismissible: false,
      builder: (context) => AlertDialog(
@@ -44,7 +47,7 @@ class _HomePageState extends State<HomePage> {
         TextButton(onPressed: (){
           pb.authStore.clear();
           const FlutterSecureStorage().delete(key: "pb_auth");
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
         }, child: const Text("Log out")),
         TextButton(onPressed: () async {  
           final verified = await pb.collection('users').getOne(
@@ -69,13 +72,13 @@ class _HomePageState extends State<HomePage> {
   }
     } catch(e) {
       showDialog(context: context, builder: (context) => AlertDialog(
-        title: Text("Something went wrong logging in"),
+        title: const Text("Something went wrong logging in"),
         content: Text("${e.toString()}\n\nYou can either log out or try refreshing"),
         actions: [TextButton(onPressed: () {
           pb.authStore.clear();
-        FlutterSecureStorage().delete(key: "pb_auth");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
-        }, child: Text("Log Out"))],
+        const FlutterSecureStorage().delete(key: "pb_auth");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
+        }, child: const Text("Log Out"))],
       ));
     }
   
@@ -94,10 +97,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      title: Placeholder(fallbackHeight: 40, fallbackWidth: 200,),
+      title: const Placeholder(fallbackHeight: 40, fallbackWidth: 200,),
       actions: [
-        IconButton(icon: Icon(Icons.account_circle_outlined), onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage()));
+        IconButton(icon: const Icon(Icons.account_circle_outlined), onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountPage()));
 
         },)
         

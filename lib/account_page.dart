@@ -25,7 +25,7 @@ class _AccountPageState extends State<AccountPage> {
       floatingActionButton: FloatingActionButton.extended(onPressed: () {
         pb.authStore.clear();
         FlutterSecureStorage().delete(key: "pb_auth");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: null,)), (route) => false);
 
       }, label: Text("Logout"), icon: Icon(Icons.logout),),
 
