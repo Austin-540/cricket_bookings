@@ -20,14 +20,14 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Your Account"), 
+      appBar: AppBar(title: const Text("Your Account"), 
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
       floatingActionButton: FloatingActionButton.extended(onPressed: () {
         pb.authStore.clear();
-        FlutterSecureStorage().delete(key: "pb_auth");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: null,)), (route) => false);
+        const FlutterSecureStorage().delete(key: "pb_auth");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
 
-      }, label: Text("Logout"), icon: Icon(Icons.logout),),
+      }, label: const Text("Logout"), icon: const Icon(Icons.logout),),
 
       body: FutureBuilder(
         future: accountData,
@@ -41,7 +41,7 @@ class _AccountPageState extends State<AccountPage> {
           } else if (snapshot.hasError) {
             return Text("Something went wrong getting your account data.\n${snapshot.error.toString()}");
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
