@@ -7,6 +7,7 @@ import 'package:pocketbase/pocketbase.dart';
 import 'package:passkeys/authenticator.dart';
 import 'package:passkeys/types.dart';
 import 'globals.dart';
+import 'reset_password_page.dart';
 import 'signup_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -255,6 +256,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             padding: const EdgeInsets.all(8.0),
             child: Text("Login"),
           )),
+          TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));}, child: Text("Forgot my password or my passkey isn't working")),
           Text("OR"),
       ],
     );
