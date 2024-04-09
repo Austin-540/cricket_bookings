@@ -100,6 +100,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             showDialog(context: context, builder: (context) => AlertDialog(
               title: Text("Something went wrong :/"),
               content: Text(e.toString()),
+              actions: [TextButton(onPressed: (){Navigator.pop(context);}, child: Text("OK"))],
             ));
           }
           }
