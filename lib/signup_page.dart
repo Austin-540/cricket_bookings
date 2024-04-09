@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shc_cricket_bookings/login_page.dart';
 import 'package:passkeys/authenticator.dart';
 import 'package:web_browser_detect/web_browser_detect.dart';
@@ -36,14 +36,25 @@ class SignupPageForm extends StatefulWidget {
 
 class _SignupPageFormState extends State<SignupPageForm> {
   Future attemptMakePasskey(username, bool useCrossPlatform) async {
-    final browser = Browser.detectOrNull();
-
     String attachment;
-    if (browser?.browser == "Safari" || useCrossPlatform) {
-      attachment = "cross-platform";
+    if (kIsWeb) {
+    final browser = Browser.detectOrNull();
+     if (browser?.browser == "Safari"){
+      attachment = "platform";
     } else {
       attachment = "";
     }
+    } else {
+      if (useCrossPlatform) {
+      attachment = "cross-platform";
+    } else {
+      attachment = "platform";
+    }
+    }
+    //The attachment can be set to null by regular web apps by not including it in the dictionary of credential
+    //creation options. Chrome and Firefox understand that platform = "" means all platforms. Safari will always
+    //use platform authenticators, and native platforms will always try platform on the first attempt and cross-platform
+    //on the second attempt
 
 
     final passkeyAuthenticator = PasskeyAuthenticator();
@@ -79,16 +90,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
                         "clientDataJSON": platformRes.clientDataJSON
                       }
                     });
-      
-              // await pb.collection('users').authWithPassword(email, password);
-      
-            // const storage = FlutterSecureStorage();
-      
-            //   final encoded = jsonEncode(<String, dynamic>{
-            //     "token": pb.authStore.token,
-            //     "model": pb.authStore.model,
-            //   });
-            //   await storage.write(key: "pb_auth", value: encoded);
+
 
             if (!mounted) return;
             
