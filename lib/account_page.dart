@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shc_cricket_bookings/login_page.dart';
-
+import 'show_licenses.dart';
 import 'globals.dart';
 import 'package:flutter/material.dart';
 
@@ -35,7 +35,8 @@ class _AccountPageState extends State<AccountPage> {
           if (snapshot.hasData) {
             return Column(
               children: [
-                Text(snapshot.data.toString())
+                Text(snapshot.data.toString()),
+                ElevatedButton(onPressed: ()=>showLicenses(context), child: Text("App Info"))
               ],
             );
           } else if (snapshot.hasError) {
