@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^9.0.0
+  flutter_svg: ^2.0.10+1
   passkeys: ^2.0.8
   pocketbase: ^0.18.1
   web_browser_detect: ^2.0.3
