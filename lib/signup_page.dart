@@ -142,6 +142,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
           // ),
       
           FilledButton.tonal(onPressed: () async {
+            if (email == "") return;
             final username = email.replaceFirst(RegExp(r"@"), "__at__"); //double underscores
             // if (email == "" || password == "") return;
             //temporarily disabled for passkey stuff
@@ -208,8 +209,8 @@ class _SignupPageFormState extends State<SignupPageForm> {
             )),
             Padding(
               padding: const EdgeInsets.all(15.0),
-              child: Text("It is recommended that you save your passkey to your phone so that you can login on all your devices.",
-              textAlign: TextAlign.center,),
+              child: kIsWeb? Text("It is recommended that you save your passkey to your phone so that you can login on all your devices.",
+              textAlign: TextAlign.center,):null,
             )
         ],
       ),

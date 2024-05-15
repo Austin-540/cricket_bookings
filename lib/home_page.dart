@@ -15,6 +15,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int currentPageIndex = 0;
+  static List destinations = [
+  Placeholder(),
+  Placeholder(),
+  Placeholder(),
+  AccountPage()
+  ];
   
 
   Future setupPBAuth() async {
@@ -27,7 +34,7 @@ class _HomePageState extends State<HomePage> {
       pb.authStore.save(token, model);}
   }
   Future checkVerified() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 300));
     try{
       final pbAuthModel = pb.authStore.model;
       print(pb.authStore.model.toString());
@@ -41,8 +48,8 @@ class _HomePageState extends State<HomePage> {
     showDialog(context: context,
     barrierDismissible: false,
      builder: (context) => AlertDialog(
-      title: const Text("Your email isn't verified"),
-      content: const Text("You have been sent a new link to verify your email. You cannot continue without doing this step."),
+      title: const Text("You're almost done"),
+      content: const Text("You have been sent a link to verify your email. You cannot continue without doing this step."),
       actions: [
         TextButton(onPressed: (){
           pb.authStore.clear();
@@ -71,6 +78,12 @@ class _HomePageState extends State<HomePage> {
 
   }
     } catch(e) {
+      if (!pb.authStore.isValid) {
+        final String? email = pb.authStore.model.data['email'];
+        await FlutterSecureStorage().delete(key: "pb_auth");
+        pb.authStore.clear();
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: email)), (route) => false);
+      } else {
       showDialog(context: context, builder: (context) => AlertDialog(
         title: const Text("Something went wrong logging in"),
         content: Text("${e.toString()}\n\nYou can either log out or try refreshing"),
@@ -80,6 +93,7 @@ class _HomePageState extends State<HomePage> {
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
         }, child: const Text("Log Out"))],
       ));
+      }
     }
   
 
@@ -96,15 +110,26 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      title: const Placeholder(fallbackHeight: 40, fallbackWidth: 200,),
-      actions: [
-        IconButton(icon: const Icon(Icons.account_circle_outlined), onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountPage()));
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int i) {
+            setState(() {
+              currentPageIndex = i;
+            });
+          },
+          selectedIndex: currentPageIndex,
+          destinations: [
+          NavigationDestination(icon: Icon(Icons.home_outlined), label: "Home"),
+          NavigationDestination(icon: Icon(Icons.shopping_cart_outlined), label: "Make a booking"),
+          NavigationDestination(icon: Icon(Icons.view_comfy_outlined), label: "See availability"),
+          NavigationDestination(icon: Icon(Icons.account_box_outlined), label: "Your account")
+        ],),
 
-        },)
-        
-        
+        body: IndexedStack(index: currentPageIndex,
+        children: [
+          Placeholder(),
+          Placeholder(),
+          Placeholder(),
+          AccountPage()
         ],),
 
     );
