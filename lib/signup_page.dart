@@ -242,6 +242,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: TextField(onChanged: (value)=>password = value,
+          obscureText: true,
           decoration: const InputDecoration(filled: true,
           prefixIcon: Icon(Icons.password_outlined),
           border: OutlineInputBorder(),
