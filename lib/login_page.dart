@@ -121,6 +121,14 @@ class _LoginPageFormState extends State<LoginPageForm> {
     }
   }
 
+  double getPaddingWidth() {
+    double paddingWidth = 8;
+    if (MediaQuery.of(context).size.width > 550) {
+      paddingWidth = (MediaQuery.of(context).size.width - 550) / 2;
+    }
+    return paddingWidth;
+  }
+
   Route _createRoute() {
     return PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 200),
@@ -157,43 +165,46 @@ class _LoginPageFormState extends State<LoginPageForm> {
           padding: const EdgeInsets.all(8.0),
           child: Form(
             child: AutofillGroup(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      initialValue: widget.defaultEmail,
-                      
-                      autofillHints: [
-                        AutofillHints.email,
-                        AutofillHints.username
-                      ],
-                      decoration: InputDecoration(filled: true,
-                      prefixIcon: Icon(Icons.person_outline),
-                      border: OutlineInputBorder(),
-                      label: Text("Email")
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: getPaddingWidth()),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        initialValue: widget.defaultEmail,
+                        
+                        autofillHints: [
+                          AutofillHints.email,
+                          AutofillHints.username
+                        ],
+                        decoration: InputDecoration(filled: true,
+                        prefixIcon: Icon(Icons.person_outline),
+                        border: OutlineInputBorder(),
+                        label: Text("Email")
+                        ),
+                        onChanged: (value) => email = value,
                       ),
-                      onChanged: (value) => email = value,
                     ),
-                  ),
-              
-                  Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              autofillHints: [
-                                AutofillHints.password,
-                              ],
-                              obscureText: true,
-                              decoration: InputDecoration(filled: true,
-                              prefixIcon: Icon(Icons.password_outlined),
-                              border: OutlineInputBorder(),
-                              label: Text("Password (Leave empty to use a passkey)")
+                
+                    Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                autofillHints: [
+                                  AutofillHints.password,
+                                ],
+                                obscureText: true,
+                                decoration: InputDecoration(filled: true,
+                                prefixIcon: Icon(Icons.password_outlined),
+                                border: OutlineInputBorder(),
+                                label: Text("Password (Leave empty to use a passkey)")
+                                ),
+                                onChanged: (value) => password = value,
                               ),
-                              onChanged: (value) => password = value,
                             ),
-                          ),
-              
-                ],
+                
+                  ],
+                ),
               ),
             ),
           ),
