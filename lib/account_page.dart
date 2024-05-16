@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shc_cricket_bookings/login_page.dart';
 import 'show_licenses.dart';
 import 'globals.dart';
@@ -12,10 +13,29 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  bool hasPasskey = false;
+
+
+  Future getAccountData() async{
+  final data = await pb.collection('users').getOne(pb.authStore.model.id,
+    expand: 'permissions',
+    // fields: 'email, pfp, permissions.name, webauthn_id_b64'
+    );
+
+    if (data.data['webauthn_id_b64'] != null && data.data['webauthn_id_b64'] != "") {
+      hasPasskey = true;
+    }
+    return data;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAccountDatas = getAccountData();
+    
+  }
+  Future? getAccountDatas;
   
-  Future accountData = pb.collection('users').getOne(pb.authStore.model.id,
-  expand: 'permissions',
-);
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +50,36 @@ class _AccountPageState extends State<AccountPage> {
       }, label: const Text("Logout"), icon: const Icon(Icons.logout),),
 
       body: FutureBuilder(
-        future: accountData,
+        future: getAccountDatas,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Column(
               children: [
-                Text(snapshot.data.toString()),
-                ElevatedButton(onPressed: ()=>showLicenses(context), child: Text("App Info"))
+                ElevatedButton(onPressed: ()=>showLicenses(context), child: Text("App Info")),
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(width: 3),
+                          left: BorderSide(width: 3),
+                          bottom: BorderSide(width: 3),
+                          right: BorderSide(width: 3),
+                        )
+                      ),
+                      child: SvgPicture.network(snapshot.data.data['pfp'])),
+                      Column(
+                        children: [
+                          Text(snapshot.data.data['email']),
+                          Text(snapshot.data.expand['permissions'][0].data['name']),
+                          Text("Account balance goes here"),
+                          hasPasskey?
+                          Text("Your account has a passkey"):
+                          Text("Your account doesn't have a passkey")
+                        ],
+                      ),
+                  ],
+                )
               ],
             );
           } else if (snapshot.hasError) {

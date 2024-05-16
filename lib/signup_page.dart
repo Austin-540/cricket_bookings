@@ -250,7 +250,9 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
         ),
 
         FilledButton.tonal(onPressed: ()async{
-          loading = true;
+          setState(() {
+            loading = true;
+          }); 
           try{
 await pb.collection('users').create(
           body: {
@@ -266,7 +268,9 @@ await pb.collection('users').create(
             TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: widget.email,)), (route) => false), child: const Text("Login Page"))
           ],));
           } catch (e) {
+            setState(() {
             loading = false;
+            });
             showDialog(context: context, builder: (context)=> AlertDialog(
               title: const Text("Something went wrong :/"),
               content: Text(e.toString()),
