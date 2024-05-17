@@ -262,11 +262,8 @@ await pb.collection('users').create(
             "password": password,
             "passwordConfirm": password,
           });
-          showDialog(context: context, builder: (context) => AlertDialog(title: const Text("Successfully set password"),
-          content: const Text("Your password has been set. You will now need to login with your new account details."),
-          actions: [
-            TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: widget.email,)), (route) => false), child: const Text("Login Page"))
-          ],));
+          await pb.collection('users').authWithPassword(widget.email, password);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
           } catch (e) {
             setState(() {
             loading = false;
