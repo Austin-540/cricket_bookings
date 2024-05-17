@@ -16,12 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
-  static List destinations = [
-  Placeholder(),
-  Placeholder(),
-  Placeholder(),
-  AccountPage()
-  ];
   
 
   Future setupPBAuth() async {
@@ -129,7 +123,7 @@ class _HomePageState extends State<HomePage> {
           Placeholder(),
           Placeholder(),
           Placeholder(),
-          AccountPage()
+          AccountPage(selected: currentPageIndex==3?true:false)
         ],),
 
     );
