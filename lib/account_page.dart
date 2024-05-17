@@ -65,7 +65,7 @@ class _AccountPageState extends State<AccountPage> {
                           right: BorderSide(width: 3),
                         )
                       ),
-                      child: SvgPicture.network(snapshot.data.data['pfp']?? "")),
+                      child: SvgPicture.network(snapshot.data.data['pfp'])),
                       Column(
                         children: [
                           Text(snapshot.data.data['email']),
