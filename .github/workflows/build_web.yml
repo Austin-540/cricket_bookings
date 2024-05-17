@@ -1,0 +1,32 @@
+name: "Actions"
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  WebAndLinux:
+    name: "Ubuntu build - web"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - name: "Dependencies"
+        run: flutter pub get
+      - name: "Build web"
+        run: flutter build web --release --web-renderer canvaskit
+      - name: "zip"
+        run: zip -r LatestWeb.zip build/web/
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        id: 'auto-releases'
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Latest Versions"
+          files: LatestWeb.zip
+
+      - name: "print url"
+        run: echo ${{ steps.auto-releases.outputs.upload_url }}
