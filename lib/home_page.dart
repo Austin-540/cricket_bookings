@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'booking_page.dart';
 import 'package:shc_cricket_bookings/login_page.dart';
 import 'account_page.dart';
 import 'globals.dart';
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
         body: IndexedStack(index: currentPageIndex,
         children: [
           Placeholder(),
-          Placeholder(),
+          BookingPage(selected: currentPageIndex==1?true:false),
           Placeholder(),
           AccountPage(selected: currentPageIndex==3?true:false)
         ],),
