@@ -15,7 +15,7 @@ jobs:
       - name: "Dependencies"
         run: flutter pub get
       - name: "Build web"
-        run: flutter build web --wasm
+        run: flutter build web
       - name: "zip"
         run: zip -r LatestWeb.zip build/web/
 
