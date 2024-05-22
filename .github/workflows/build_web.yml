@@ -15,7 +15,7 @@ jobs:
       - name: "Dependencies"
         run: flutter pub get
       - name: "Build web"
-        run: flutter build web --release --web-renderer canvaskit
+        run: flutter build web --wasm --release --web-renderer canvaskit
       - name: "zip"
         run: zip -r LatestWeb.zip build/web/
 
