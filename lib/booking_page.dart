@@ -18,8 +18,15 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
+  List<bool> checkboxesSelected = [];
   DateTime? datePicked = DateTime.now();
   final timeslots = [TimeSlot(startTime: 9, endTime: 10, booked: false)];
+
+  @override
+  void initState() {
+    checkboxesSelected = List.filled(timeslots.length, false);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +63,10 @@ class _BookingPageState extends State<BookingPage> {
                     children: [
                       Checkbox(
                         
-                        value: false, onChanged: timeslots[i].booked? null:(value){
-
+                        value: checkboxesSelected[i], onChanged: timeslots[i].booked? null:(value){
+                          setState(() {
+                            checkboxesSelected[i] = value!;
+                          });
                       } ,),
                       timeslots[i].booked? const Text("Booked"): const Text("Available")
                     ],
