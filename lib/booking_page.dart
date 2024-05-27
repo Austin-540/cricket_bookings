@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart';
+import 'checkout_page.dart';
 
 class TimeSlot {
   // ignore: non_constant_identifier_names
@@ -9,6 +10,7 @@ class TimeSlot {
     final bool booked;
     // ignore: non_constant_identifier_names
     final String am_or_pm;
+
 }
 
 class BookingPage extends StatefulWidget {
@@ -30,8 +32,6 @@ class _BookingPageState extends State<BookingPage> {
       final pbTimeslots = await pb.collection("timeslots").getFullList(sort: '-created');
       print(pbTimeslots);
       return pbTimeslots;
-
-      
       
   }
 
@@ -53,6 +53,8 @@ class _BookingPageState extends State<BookingPage> {
     
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(onPressed: () {
+        var selectedTimeslots = timeslots.where((timeSlot) => checkboxesSelected[timeslots.indexOf(timeSlot)]).toList();
+        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots)));
 
       }, label: Text("Checkout"), icon: Icon(Icons.shopping_cart_outlined),),
       appBar: AppBar(
