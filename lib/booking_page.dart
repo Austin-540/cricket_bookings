@@ -25,7 +25,7 @@ class BookingPage extends StatefulWidget {
 class _BookingPageState extends State<BookingPage> {
   List<bool> checkboxesSelected = [];
   DateTime? datePicked = DateTime.now();
-  List timeslots = [TimeSlot(startTime: 9, endTime: 10, booked: false, am_or_pm: "AM")];
+  List<TimeSlot> timeslots = [TimeSlot(startTime: 9, endTime: 10, booked: false, am_or_pm: "AM")];
   Future? getTimeslots;
 
   Future getTheTimeslots() async {
@@ -53,7 +53,7 @@ class _BookingPageState extends State<BookingPage> {
     
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(onPressed: () {
-        var selectedTimeslots = timeslots.where((timeSlot) => checkboxesSelected[timeslots.indexOf(timeSlot)]).toList();
+        List<TimeSlot> selectedTimeslots = timeslots.where((timeSlot) => checkboxesSelected[timeslots.indexOf(timeSlot)]).toList();
         Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots)));
 
       }, label: Text("Checkout"), icon: Icon(Icons.shopping_cart_outlined),),
