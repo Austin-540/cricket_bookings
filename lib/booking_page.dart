@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-
+import 'globals.dart';
 
 class TimeSlot {
-  TimeSlot({required this.startTime, required this.endTime, required this.booked});
+  // ignore: non_constant_identifier_names
+  TimeSlot({required this.startTime, required this.endTime, required this.booked, required this.am_or_pm});
     final int startTime;
     final int endTime;
     final bool booked;
+    // ignore: non_constant_identifier_names
+    final String am_or_pm;
 }
 
 class BookingPage extends StatefulWidget {
@@ -20,11 +23,23 @@ class BookingPage extends StatefulWidget {
 class _BookingPageState extends State<BookingPage> {
   List<bool> checkboxesSelected = [];
   DateTime? datePicked = DateTime.now();
-  final timeslots = [TimeSlot(startTime: 9, endTime: 10, booked: false)];
+  List timeslots = [TimeSlot(startTime: 9, endTime: 10, booked: false, am_or_pm: "AM")];
+  Future? getTimeslots;
+
+  Future getTheTimeslots() async {
+      final pbTimeslots = await pb.collection("timeslots").getFullList(sort: '-created');
+      print(pbTimeslots);
+      return pbTimeslots;
+
+      
+      
+  }
 
   @override
   void initState() {
     checkboxesSelected = List.filled(timeslots.length, false);
+    if (widget.selected == true){getTimeslots = getTheTimeslots();}
+
     super.initState();
   }
 
@@ -33,9 +48,13 @@ class _BookingPageState extends State<BookingPage> {
     if (!widget.selected) {
       return const Text("Not Selected! You should not see this screen!");
     }
+    getTimeslots ??= getTheTimeslots();
 
     
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(onPressed: () {
+
+      }, label: Text("Checkout"), icon: Icon(Icons.shopping_cart_outlined),),
       appBar: AppBar(
         title: const Text("Book a timeslot"),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -50,12 +69,16 @@ class _BookingPageState extends State<BookingPage> {
             });
           }, child: const Text("Pick a different date")),
           Text("Date selected: $datePicked"),
-          for (var i=0; i< timeslots.length; i++) ... [
+          FutureBuilder(future: getTimeslots, 
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Column(
+                children: [for (var i=0; i< timeslots.length; i++) ... [
               Card(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(children: [
-                Text("${timeslots[i].startTime} - ${timeslots[i].endTime}", style: const TextStyle(fontSize: 40),),
+                Text("${timeslots[i].startTime} - ${timeslots[i].endTime} ${timeslots[i].am_or_pm}", style: const TextStyle(fontSize: 40),),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -75,7 +98,17 @@ class _BookingPageState extends State<BookingPage> {
               ],),
             ),
           )
-          ],
+          ]],
+              );
+            } else if (snapshot.hasError) {
+              return Icon(Icons.error_outline);
+            }
+            else {
+              return CircularProgressIndicator();
+            }
+          } 
+          ,),
+          
           
         ],
         ),
