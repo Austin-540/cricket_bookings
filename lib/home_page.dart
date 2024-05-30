@@ -110,6 +110,7 @@ class _HomePageState extends State<HomePage> {
               currentPageIndex = i;
             });
           },
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           selectedIndex: currentPageIndex,
           destinations: [
           NavigationDestination(icon: Icon(Icons.home_outlined), label: "Home"),
