@@ -37,6 +37,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     super.initState();
     futureBldrData = getPbPrices();
   }
+
+  bool loading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,9 +57,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
             },
           ),
 
-            OutlinedButton(onPressed: (){
-              //code for making a booking goes here
-            }, child: const Text("Book it")) 
+            OutlinedButton(onPressed: ()async{
+              if (loading) {
+                return;
+              } //This means that pressing the button multiple times will not make multiple bookings
+              setState(() {
+              loading = true;
+              });
+              final body = <String, dynamic>{
+  "booker": "RELATION_RECORD_ID",
+  "start_time": "2022-01-01 10:00:00.123Z",
+  "end_time": "2022-01-01 10:00:00.123Z",
+  "cost": 123
+};
+
+final record = await pb.collection('bookings').create(body: body);
+            }, child: loading?const CircularProgressIndicator():const Text("Book it")) 
         ],),
     );
   }
