@@ -58,8 +58,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
           for (int i = 0; i < widget.timeslots.length; i++) ... [
             Hero(
               tag: "booking_time",
-              child: Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
-              style: const TextStyle(fontSize: 50, color: Colors.black, decoration: TextDecoration.none, fontWeight: FontWeight.normal),),
+              child: Material(
+                child: Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
+                style: const TextStyle(fontSize: 50),),
+              ),
             ),
           ],
           Text("${widget.date.day}/${widget.date.month} ${widget.date.year}"),
