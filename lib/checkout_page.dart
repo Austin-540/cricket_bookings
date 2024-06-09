@@ -1,3 +1,5 @@
+import 'package:shc_cricket_bookings/home_page.dart';
+
 import 'booking_page.dart';
 import 'package:flutter/material.dart';
 import 'globals.dart';
@@ -38,6 +40,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
     futureBldrData = getPbPrices();
   }
 
+  DateTime timeintToDateTime(int time, DateTime date, String am_or_pm) {
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+      am_or_pm == "PM"? 12+time: time,
+    );
+  }
+
   bool loading = false;
   @override
   Widget build(BuildContext context) {
@@ -45,8 +56,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
       appBar: AppBar(title: const Text("Checkout"), backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
         body: Column(children: [
           for (int i = 0; i < widget.timeslots.length; i++) ... [
-            Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
-            style: const TextStyle(fontSize: 50),),
+            Hero(
+              tag: "booking_time",
+              child: Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
+              style: const TextStyle(fontSize: 50, color: Colors.black, decoration: TextDecoration.none, fontWeight: FontWeight.normal),),
+            ),
           ],
           Text("${widget.date.day}/${widget.date.month} ${widget.date.year}"),
 
@@ -64,14 +78,37 @@ class _CheckoutPageState extends State<CheckoutPage> {
               setState(() {
               loading = true;
               });
-              final body = <String, dynamic>{
-  "booker": "RELATION_RECORD_ID",
-  "start_time": "2022-01-01 10:00:00.123Z",
-  "end_time": "2022-01-01 10:00:00.123Z",
-  "cost": 123
+try {
+
+
+              for (final timeslot in widget.timeslots) {
+
+                
+final body = <String, dynamic>{
+  "booker": pb.authStore.model.id,
+  "start_time": timeintToDateTime(timeslot.startTime, widget.date, timeslot.am_or_pm).toIso8601String(),
+  "end_time": timeintToDateTime(timeslot.endTime, widget.date, timeslot.am_or_pm).toIso8601String(),
+  "cost": -1 //this number will be written by PB hooks to ensure bookings cannot be made without paying
+  //the purpose of the cost field is to ensure any discounts are taken into account when issuing a refund
 };
 
 final record = await pb.collection('bookings').create(body: body);
+setState(() {
+loading = false;
+
+});
+Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false,);
+              }}
+              catch (e) {
+                setState(() {
+                  loading = false;
+                  showDialog(context: context, builder: (context) => AlertDialog(
+                    title: const Text("Something went wrong"),
+                    content: Text(e.toString()),
+                  ));
+                });
+              }
+              
             }, child: loading?const CircularProgressIndicator():const Text("Book it")) 
         ],),
     );
