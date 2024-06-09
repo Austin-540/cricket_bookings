@@ -71,7 +71,7 @@ class _BookingPageState extends State<BookingPage> {
         if (selectedTimeslots.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked!)));
         }
 
       }, label: Text("Checkout"), icon: Icon(Icons.shopping_cart_outlined),),

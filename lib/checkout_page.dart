@@ -2,7 +2,8 @@ import 'booking_page.dart';
 import 'package:flutter/material.dart';
 
 class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key, required this.timeslots});
+  const CheckoutPage({super.key, required this.timeslots, required this.date});
+  final DateTime date;
   final List<TimeSlot> timeslots;
 
   @override
@@ -19,6 +20,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
             style: TextStyle(fontSize: 50),),
           ],
+          Text("${widget.date.day}/${widget.date.month} ${widget.date.year}"),
             Text("Cost goes here",
             style: TextStyle(fontSize: 30),),
             OutlinedButton(onPressed: (){
