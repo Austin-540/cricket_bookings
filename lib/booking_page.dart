@@ -29,7 +29,6 @@ class _BookingPageState extends State<BookingPage> {
 
   Future getTheTimeslots() async {
       final pbTimeslots = await pb.collection("timeslots").getFullList(sort: '-created');
-      print(pbTimeslots);
       checkboxesSelected = List.filled(pbTimeslots.length, false);
       List<TimeSlot> formattedTimeslots = [];
       for (final timeslot in pbTimeslots) {
@@ -69,12 +68,12 @@ class _BookingPageState extends State<BookingPage> {
         List<TimeSlot> tslots = await getTimeslots;
         List<TimeSlot> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
         if (selectedTimeslots.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("You need to select at least 1 timeslot"),));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
         Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked!)));
         }
 
-      }, label: Text("Checkout"), icon: Icon(Icons.shopping_cart_outlined),),
+      }, label: const Text("Checkout"), icon: const Icon(Icons.shopping_cart_outlined),),
       appBar: AppBar(
         title: const Text("Book a timeslot"),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -121,10 +120,10 @@ class _BookingPageState extends State<BookingPage> {
           ]],
               );
             } else if (snapshot.hasError) {
-              return Icon(Icons.error_outline);
+              return const Icon(Icons.error_outline);
             }
             else {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             }
           } 
           ,),

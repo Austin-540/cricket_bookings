@@ -19,9 +19,9 @@ class _HomePageState extends State<HomePage> {
   
 
   Future setupPBAuth() async {
-    final String? pb_auth = await const FlutterSecureStorage().read(key: "pb_auth");
-    if (pb_auth != null) {
-      final decoded = jsonDecode(pb_auth);
+    final String? pbAuth = await const FlutterSecureStorage().read(key: "pb_auth");
+    if (pbAuth != null) {
+      final decoded = jsonDecode(pbAuth);
       final token = (decoded as Map<String, dynamic>)["token"] as String? ?? "";
       final model = RecordModel.fromJson(
         decoded["model"] as Map<String, dynamic>? ?? {});
@@ -30,8 +30,6 @@ class _HomePageState extends State<HomePage> {
   Future checkVerified() async {
     await Future.delayed(const Duration(milliseconds: 300));
     try{
-      final pbAuthModel = pb.authStore.model;
-      print(pb.authStore.model.toString());
       final record = await pb.collection('users').getOne(pb.authStore.model.id,
   fields: "email, verified"
 );
@@ -74,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     } catch(e) {
       if (!pb.authStore.isValid) {
         final String? email = pb.authStore.model.data['email'];
-        await FlutterSecureStorage().delete(key: "pb_auth");
+        await const FlutterSecureStorage().delete(key: "pb_auth");
         pb.authStore.clear();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: email)), (route) => false);
       } else {
@@ -112,7 +110,7 @@ class _HomePageState extends State<HomePage> {
           },
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           selectedIndex: currentPageIndex,
-          destinations: [
+          destinations: const [
           NavigationDestination(icon: Icon(Icons.home_outlined), label: "Home"),
           NavigationDestination(icon: Icon(Icons.shopping_cart_outlined), label: "Make a booking"),
           NavigationDestination(icon: Icon(Icons.view_comfy_outlined), label: "See availability"),
@@ -121,9 +119,9 @@ class _HomePageState extends State<HomePage> {
 
         body: IndexedStack(index: currentPageIndex,
         children: [
-          Placeholder(),
+          const Placeholder(),
           BookingPage(selected: currentPageIndex==1?true:false),
-          Placeholder(),
+          const Placeholder(),
           AccountPage(selected: currentPageIndex==3?true:false)
         ],),
 

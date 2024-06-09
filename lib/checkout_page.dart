@@ -17,7 +17,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final pbCosts = await pb.collection('prices').getFullList(
   sort: '-created',
 );
-    print(pbCosts.toString());
 
 
     //now get my account type
@@ -28,10 +27,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   expand: "permissions"
 );
 
-print(myPermission);
 
   final foundPrice = pbCosts.firstWhere((x) => x.data['account_type'] == myPermission.data["permissions"]).data['price'];
-  print(foundPrice);
   return foundPrice;
   }
   Future? futureBldrData;
@@ -43,24 +40,24 @@ print(myPermission);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Checkout"), backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
+      appBar: AppBar(title: const Text("Checkout"), backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
         body: Column(children: [
           for (int i = 0; i < widget.timeslots.length; i++) ... [
             Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
-            style: TextStyle(fontSize: 50),),
+            style: const TextStyle(fontSize: 50),),
           ],
           Text("${widget.date.day}/${widget.date.month} ${widget.date.year}"),
 
           FutureBuilder(
             future: futureBldrData,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              return snapshot.hasData?Text("\$${snapshot.data*widget.timeslots.length}", style: TextStyle(fontSize: 30)):Text("Getting the cost...");
+              return snapshot.hasData?Text("\$${snapshot.data*widget.timeslots.length}", style: const TextStyle(fontSize: 30)):const Text("Getting the cost...");
             },
           ),
 
             OutlinedButton(onPressed: (){
               //code for making a booking goes here
-            }, child: Text("Book it")) 
+            }, child: const Text("Book it")) 
         ],),
     );
   }

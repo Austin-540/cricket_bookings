@@ -18,7 +18,6 @@ class _AccountPageState extends State<AccountPage> {
 
 
   Future getAccountData() async{
-    print("getting account page data...");
   final data = await pb.collection('users').getOne(pb.authStore.model.id,
     expand: 'permissions',
     // fields: 'email, pfp, permissions.name, webauthn_id_b64'
@@ -36,7 +35,6 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     if (getAccountDatas == null && widget.selected == true){
     getAccountDatas= getAccountData();}
-    print("selected: ${widget.selected.toString()}");
     return widget.selected == null || widget.selected == false? const Text("Page isn't selected -- you shouldn't see this page"): Scaffold(
       appBar: AppBar(title: const Text("Your Account"), 
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
@@ -103,7 +101,7 @@ class _AccountPageState extends State<AccountPage> {
                                 ],
                               ),
                             ),
-                            Spacer(),
+                            const Spacer(),
                   TextButton(onPressed: ()=>showLicenses(context), child: const Text("App Info")),
                 ],
               ),

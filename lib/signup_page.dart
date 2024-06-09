@@ -207,8 +207,8 @@ class _SignupPageFormState extends State<SignupPageForm> {
               padding: EdgeInsets.all(8.0),
               child: Text("Sign up"),
             )),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
+            const Padding(
+              padding: EdgeInsets.all(15.0),
               child: kIsWeb? Text("It is recommended that you save your passkey to your phone so that you can login on all your devices.",
               textAlign: TextAlign.center,):null,
             )
@@ -220,8 +220,8 @@ class _SignupPageFormState extends State<SignupPageForm> {
 
 class SetPasswordPage extends StatefulWidget {
   const SetPasswordPage({super.key, required this.username, required this.email});
-    final username;
-  final email;
+    final String username;
+  final String email;
 
   @override
   State<SetPasswordPage> createState() => _SetPasswordPageState();
@@ -263,7 +263,7 @@ await pb.collection('users').create(
             "passwordConfirm": password,
           });
           await pb.collection('users').authWithPassword(widget.email, password);
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
           } catch (e) {
             setState(() {
             loading = false;
