@@ -25,20 +25,33 @@ class BookingPage extends StatefulWidget {
 class _BookingPageState extends State<BookingPage> {
   List<bool> checkboxesSelected = [];
   DateTime? datePicked = DateTime.now();
-  List<TimeSlot> timeslots = [TimeSlot(startTime: 9, endTime: 10, booked: false, am_or_pm: "AM")];
   Future? getTimeslots;
 
   Future getTheTimeslots() async {
       final pbTimeslots = await pb.collection("timeslots").getFullList(sort: '-created');
       print(pbTimeslots);
-      return pbTimeslots;
+      checkboxesSelected = List.filled(pbTimeslots.length, false);
+      List<TimeSlot> formattedTimeslots = [];
+      for (final timeslot in pbTimeslots) {
+        formattedTimeslots.add(TimeSlot(
+          am_or_pm: timeslot.data['am_or_pm'],
+          booked: false, //CHANGE THIS
+          startTime: timeslot.data['start_time'],
+          endTime: timeslot.data['end_time']
+        ));
+      }
+
+      formattedTimeslots.sort((a,b) => a.startTime.compareTo(b.startTime));
+      formattedTimeslots.sort((a, b) => a.am_or_pm.compareTo(b.am_or_pm));
+      return formattedTimeslots;
+      
       
   }
 
   @override
   void initState() {
-    checkboxesSelected = List.filled(timeslots.length, false);
-    if (widget.selected == true){getTimeslots = getTheTimeslots();}
+    checkboxesSelected = [];
+    if (widget.selected == true){getTimeslots = getTheTimeslots();} 
 
     super.initState();
   }
@@ -52,9 +65,14 @@ class _BookingPageState extends State<BookingPage> {
 
     
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(onPressed: () {
-        List<TimeSlot> selectedTimeslots = timeslots.where((timeSlot) => checkboxesSelected[timeslots.indexOf(timeSlot)]).toList();
+      floatingActionButton: FloatingActionButton.extended(onPressed: () async {
+        List<TimeSlot> tslots = await getTimeslots;
+        List<TimeSlot> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
+        if (selectedTimeslots.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("You need to select at least 1 timeslot"),));
+        } else {
         Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots)));
+        }
 
       }, label: Text("Checkout"), icon: Icon(Icons.shopping_cart_outlined),),
       appBar: AppBar(
@@ -75,12 +93,12 @@ class _BookingPageState extends State<BookingPage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Column(
-                children: [for (var i=0; i< timeslots.length; i++) ... [
+                children: [for (var i=0; i< snapshot.data.length; i++) ... [
               Card(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(children: [
-                Text("${timeslots[i].startTime} - ${timeslots[i].endTime} ${timeslots[i].am_or_pm}", style: const TextStyle(fontSize: 40),),
+                Text("${snapshot.data[i].startTime} - ${snapshot.data[i].endTime} ${snapshot.data[i].am_or_pm}", style: const TextStyle(fontSize: 40),),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -88,12 +106,12 @@ class _BookingPageState extends State<BookingPage> {
                     children: [
                       Checkbox(
                         
-                        value: checkboxesSelected[i], onChanged: timeslots[i].booked? null:(value){
+                        value: checkboxesSelected[i], onChanged: snapshot.data[i].booked? null:(value){
                           setState(() {
                             checkboxesSelected[i] = value!;
                           });
                       } ,),
-                      timeslots[i].booked? const Text("Booked"): const Text("Available")
+                      snapshot.data[i].booked? const Text("Booked"): const Text("Available")
                     ],
                   ),
                 )
