@@ -54,7 +54,7 @@ print(myPermission);
           FutureBuilder(
             future: futureBldrData,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              return snapshot.hasData?Text("\$${snapshot.data}", style: TextStyle(fontSize: 30)):Text("Getting the cost...");
+              return snapshot.hasData?Text("\$${snapshot.data*widget.timeslots.length}", style: TextStyle(fontSize: 30)):Text("Getting the cost...");
             },
           ),
 
