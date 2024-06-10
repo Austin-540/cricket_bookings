@@ -4,6 +4,7 @@ import 'package:shc_cricket_bookings/login_page.dart';
 import 'show_licenses.dart';
 import 'globals.dart';
 import 'package:flutter/material.dart';
+import 'topup_page.dart';
 
 class AccountPage extends StatefulWidget {
   AccountPage({super.key, required this.selected});
@@ -89,15 +90,16 @@ class _AccountPageState extends State<AccountPage> {
                                 ],
                               ),
                             ),
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: Row(
                                 children: [
-                                  Padding(
+                                  const Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: Icon(Icons.account_balance_outlined),
                                   ),
-                                  Text("Account balance goes here"),
+                                  Text("\$${snapshot.data.data['balance']}"),
+                                  TextButton(onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context) => TopupPage())), child: Text("Redeem a topup code"))
                                 ],
                               ),
                             ),
