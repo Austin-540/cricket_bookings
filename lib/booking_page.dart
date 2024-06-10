@@ -7,7 +7,7 @@ class TimeSlot {
   TimeSlot({required this.startTime, required this.endTime, required this.booked, required this.am_or_pm});
     final int startTime;
     final int endTime;
-    final bool booked;
+    bool booked;
     // ignore: non_constant_identifier_names
     final String am_or_pm;
 
@@ -34,14 +34,32 @@ class _BookingPageState extends State<BookingPage> {
       for (final timeslot in pbTimeslots) {
         formattedTimeslots.add(TimeSlot(
           am_or_pm: timeslot.data['am_or_pm'],
-          booked: false, //CHANGE THIS
+          booked: false, //defaults to false, gets changed to true later
           startTime: timeslot.data['start_time'],
           endTime: timeslot.data['end_time']
         ));
       }
 
-      formattedTimeslots.sort((a,b) => a.startTime.compareTo(b.startTime));
+      formattedTimeslots.sort((a, b) => a.startTime.compareTo(b.startTime));
       formattedTimeslots.sort((a, b) => a.am_or_pm.compareTo(b.am_or_pm));
+
+      final bookedSlots = await pb.collection('bookings').getFullList(
+        sort: '-created',
+        fields: "start_time"
+      );
+      bookedSlots.removeWhere((element) => DateTime.parse(element.data['start_time']).day != DateTime.now().day || DateTime.parse(element.data['start_time']).month != DateTime.now().month);
+
+      Set<int> bookedTimesSet = {...bookedSlots.map((n) => DateTime.parse(n.data['start_time']).hour)};
+
+
+      for (final timeslot in formattedTimeslots) {
+        if (bookedTimesSet.contains(timeslot.startTime)) {
+          setState(() {
+          timeslot.booked = true;
+          });
+        }
+      }
+
       return formattedTimeslots;
       
       
