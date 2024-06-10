@@ -66,6 +66,10 @@ class _BookingPageState extends State<BookingPage> {
           setState(() {
           timeslot.booked = true;
           });
+        } else if (bookedTimesSet.contains(timeslot.startTime + 12)) {
+          setState(() {
+            timeslot.booked = true;
+          });
         }
       }
 
