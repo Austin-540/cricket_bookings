@@ -57,7 +57,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         body: Column(children: [
           for (int i = 0; i < widget.timeslots.length; i++) ... [
             Hero(
-              tag: "booking_time",
+              tag: "booking_time ${widget.timeslots[i].startTime}-${widget.timeslots[i].endTime}.${widget.date}",
               child: Material(
                 child: Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
                 style: const TextStyle(fontSize: 50),),
@@ -77,6 +77,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               if (loading) {
                 return;
               } //This means that pressing the button multiple times will not make multiple bookings
+              
               setState(() {
               loading = true;
               });
