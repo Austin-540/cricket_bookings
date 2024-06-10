@@ -16,6 +16,7 @@ class TimeSlot {
 class BookingPage extends StatefulWidget {
   BookingPage({super.key, required this.selected});
   bool selected;
+  bool loadingAfterDateChange = false;
   
 
   @override
@@ -28,6 +29,9 @@ class _BookingPageState extends State<BookingPage> {
   Future? getTimeslots;
 
   Future getTheTimeslots() async {
+      if (! widget.selected) {
+        return;
+      }
       final pbTimeslots = await pb.collection("timeslots").getFullList(sort: '-created');
       checkboxesSelected = List.filled(pbTimeslots.length, false);
       List<TimeSlot> formattedTimeslots = [];
@@ -47,7 +51,12 @@ class _BookingPageState extends State<BookingPage> {
         sort: '-created',
         fields: "start_time"
       );
+      try {
+      bookedSlots.removeWhere((element) => DateTime.parse(element.data['start_time']).day != datePicked!.day || DateTime.parse(element.data['start_time']).month != datePicked!.month);
+      } catch (_){
       bookedSlots.removeWhere((element) => DateTime.parse(element.data['start_time']).day != DateTime.now().day || DateTime.parse(element.data['start_time']).month != DateTime.now().month);
+
+      }
 
       Set<int> bookedTimesSet = {...bookedSlots.map((n) => DateTime.parse(n.data['start_time']).hour)};
 
@@ -60,18 +69,15 @@ class _BookingPageState extends State<BookingPage> {
         }
       }
 
+      setState(() {
+        widget.loadingAfterDateChange = false;
+      });
+
       return formattedTimeslots;
       
       
   }
 
-  @override
-  void initState() {
-    checkboxesSelected = [];
-    if (widget.selected == true){getTimeslots = getTheTimeslots();} 
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,19 +104,26 @@ class _BookingPageState extends State<BookingPage> {
       ),
       body: ListView(
         children: [
-          ElevatedButton(onPressed: () async{
+          
+          FutureBuilder(future: getTimeslots, 
+          builder: (context, snapshot) {
+            if (widget.loadingAfterDateChange) {
+              return const Center(child:CircularProgressIndicator());
+            }
+            if (snapshot.hasData) {
+              return Column(
+                children: [
+                  ElevatedButton(onPressed: () async{
             DateTime? datePickerPicked = await showDatePicker(
-              context: context, firstDate: DateTime.now(), lastDate: DateTime(2085));
+              context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
             setState(() {
               datePicked = datePickerPicked ?? DateTime.now();
+              widget.loadingAfterDateChange = true;
+              getTimeslots = getTheTimeslots();
             });
           }, child: const Text("Pick a different date")),
           Text("Date selected: $datePicked"),
-          FutureBuilder(future: getTimeslots, 
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Column(
-                children: [for (var i=0; i< snapshot.data.length; i++) ... [
+                  for (var i=0; i< snapshot.data.length; i++) ... [
               Card(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -141,7 +154,7 @@ class _BookingPageState extends State<BookingPage> {
               return const Icon(Icons.error_outline);
             }
             else {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             }
           } 
           ,),
