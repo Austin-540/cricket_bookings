@@ -18,7 +18,6 @@ class _AccountPageState extends State<AccountPage> {
 
 
   Future getAccountData() async{
-    print("getting account page data...");
   final data = await pb.collection('users').getOne(pb.authStore.model.id,
     expand: 'permissions',
     // fields: 'email, pfp, permissions.name, webauthn_id_b64'
@@ -36,7 +35,6 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     if (getAccountDatas == null && widget.selected == true){
     getAccountDatas= getAccountData();}
-    print("selected: ${widget.selected.toString()}");
     return widget.selected == null || widget.selected == false? const Text("Page isn't selected -- you shouldn't see this page"): Scaffold(
       appBar: AppBar(title: const Text("Your Account"), 
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
@@ -51,13 +49,13 @@ class _AccountPageState extends State<AccountPage> {
         future: getAccountDatas,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Column(
-              children: [
-                ElevatedButton(onPressed: ()=>showLicenses(context), child: Text("App Info")),
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
+            return Center(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: const BoxDecoration(
                         border: Border(
                           top: BorderSide(width: 3),
                           left: BorderSide(width: 3),
@@ -66,19 +64,47 @@ class _AccountPageState extends State<AccountPage> {
                         )
                       ),
                       child: SvgPicture.network(snapshot.data.data['pfp'])),
-                      Column(
-                        children: [
-                          Text(snapshot.data.data['email']),
-                          Text(snapshot.data.expand['permissions'][0].data['name']),
-                          Text("Account balance goes here"),
-                          hasPasskey?
-                          Text("Your account has a passkey"):
-                          Text("Your account doesn't have a passkey")
-                        ],
-                      ),
-                  ],
-                )
-              ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.email_outlined),
+                        ),
+                        Text(snapshot.data.data['email']),
+                      ],
+                    ),
+                  ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(Icons.account_tree_outlined),
+                                  ),
+                                  Text(snapshot.data.expand['permissions'][0].data['name']),
+                                ],
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(Icons.account_balance_outlined),
+                                  ),
+                                  Text("Account balance goes here"),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                  TextButton(onPressed: ()=>showLicenses(context), child: const Text("App Info")),
+                ],
+              ),
             );
           } else if (snapshot.hasError) {
             return Text("Something went wrong getting your account data.\n${snapshot.error.toString()}");

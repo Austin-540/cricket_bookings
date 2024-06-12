@@ -14,7 +14,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Reset Password"),
+      appBar: AppBar(title: const Text("Reset Password"),
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
 
 
@@ -22,8 +22,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         Padding(
           padding: const EdgeInsets.all(15.0),
           child: TextField(
-            autofillHints: [AutofillHints.email],
-            decoration: InputDecoration(
+            autofillHints: const [AutofillHints.email],
+            decoration: const InputDecoration(
               filled: true,
               prefixIcon: Icon(Icons.email),
               border: OutlineInputBorder(),
@@ -38,19 +38,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           await pb.collection('users').requestPasswordReset(email);
           showDialog(context: context,
              builder: (context) => AlertDialog(
-              title: Text("Check your emails"),
-              content: Text("You've been sent an email to reset your password. It could take a few minutes to arrive."),
-              actions: [TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>LoginPage(defaultEmail: email)), (route) => false), child: Text("Done"))],
+              title: const Text("Check your emails"),
+              content: const Text("You've been sent an email to reset your password. It could take a few minutes to arrive."),
+              actions: [TextButton(onPressed: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>LoginPage(defaultEmail: email)), (route) => false), child: const Text("Done"))],
              ));
           } catch (e) {
             showDialog(context: context,
              builder: (context) => AlertDialog(
-              title: Text("Something went wrong :/"),
+              title: const Text("Something went wrong :/"),
               content: Text(e.toString()),
              ));
           }
 
-        }, child: Text("Reset Password"))
+        }, child: const Text("Reset Password"))
       ],),
     );
   }
