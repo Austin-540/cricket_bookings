@@ -4,9 +4,13 @@ routerAdd("GET", "/api/shc/topup/getdetails/:code", (c) => {
     var start = new Date().getTime();
     while(new Date().getTime() < start + 300) {}
 
+    const hash = $security.sha256(code)
+
+    $app.logger().info("Looking for topup code with hash", {"hash": hash})
+
     const record = $app.dao().findFirstRecordByFilter(
         "topup_codes", "code = {:code}",
-        { code: `${code}` },
+        { code: `${hash}` },
     )
 
     return c.json(200, { 
@@ -26,7 +30,7 @@ routerAdd("POST", "/api/shc/topup/usecode/:code/:userID", (c) => {
 
     const code_record = $app.dao().findFirstRecordByFilter(
         "topup_codes", "code = {:code}",
-        { code: `${code}` },
+        { code: `${$security.sha256(code)}` },
     )
 
     const topup_amount = code_record.getInt("amount")
@@ -38,6 +42,7 @@ routerAdd("POST", "/api/shc/topup/usecode/:code/:userID", (c) => {
     }
 
     const user_record = $app.dao().findRecordById("users", userID)
+
 
     const balance = user_record.getInt("balance")
     const new_balance = balance + topup_amount
