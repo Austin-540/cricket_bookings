@@ -1,6 +1,8 @@
-routerAdd("GET", "/api/shc/topup/getdetails/:code", (c) => {
-    let code = c.pathParam("code")
+routerAdd("POST", "/api/shc/topup/getdetails", (c) => {
+    const code = $apis.requestInfo(c).data.data
+    console.log(code)
 
+    $app.logger().info("New Topup code check:", code)
     var start = new Date().getTime();
     while(new Date().getTime() < start + 300) {}
 
@@ -21,8 +23,8 @@ routerAdd("GET", "/api/shc/topup/getdetails/:code", (c) => {
      })
 }, /* optional middlewares */)
 
-routerAdd("POST", "/api/shc/topup/usecode/:code/:userID", (c) => {
-    let code = c.pathParam("code")
+routerAdd("POST", "/api/shc/topup/usecode/:userID", (c) => {
+    const code = $apis.requestInfo(c).data.data
     let userID = c.pathParam("userID")
 
     var start = new Date().getTime();

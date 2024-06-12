@@ -39,7 +39,7 @@ class _TopupPageState extends State<TopupPage> {
           ),
           ElevatedButton(onPressed: ()async{
             try {
-            final code_data = await pb.send("/api/shc/topup/getdetails/$code");
+            final code_data = await pb.send("/api/shc/topup/getdetails", body: {"data": code}, method: "POST");
               final email_data = await pb.collection('users').getOne(pb.authStore.model.id,
               fields: "email"
     );
@@ -54,7 +54,7 @@ class _TopupPageState extends State<TopupPage> {
               actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text("Nevermind")),
               TextButton(onPressed: () async {
                 try {
-                final pbResponse = await pb.send("/api/shc/topup/usecode/$code/${pb.authStore.model.id}", method: "POST");
+                final pbResponse = await pb.send("/api/shc/topup/usecode/${pb.authStore.model.id}", method: "POST", body: {"data": code});
                 print(pbResponse);
                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
                 } catch (e) {
