@@ -144,7 +144,13 @@ class _HomePagePageState extends State<HomePagePage> {
   Future? upcomingBookings;
 
   Future getUpcomingBookings() async {
-      return "";
+      final resultList = await pb.collection('bookings').getList(
+  page: 1,
+  perPage: 50,
+  filter: 'booker = "${pb.authStore.model.id}"',
+);
+
+      return resultList;
   }
 
 
@@ -169,8 +175,14 @@ class _HomePagePageState extends State<HomePagePage> {
           future: upcomingBookings,
           // initialData: InitialData, //Maybe this line will be useful for a hero animation
           builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator(),);
+            }
             return Column(children: [
-              Text(snapshot.data.toString())
+
+              for (int x = 0; x < snapshot.data.items.length; x++) ... [
+                Text(snapshot.data.items[x].data['start_time'].toString())
+              ]
             ],);
           },
         ),
