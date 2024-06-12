@@ -25,7 +25,7 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   List<bool> checkboxesSelected = [];
-  DateTime? datePicked = DateTime.now();
+  DateTime datePicked = DateTime.now();
   Future? getTimeslots;
 
   Future getTheTimeslots() async {
@@ -40,6 +40,7 @@ class _BookingPageState extends State<BookingPage> {
 
       setState(() {
         widget.loadingAfterDateChange = false;
+        checkboxesSelected = List.filled(pbSlots.length, false);
       });
 
       return pbSlots;
