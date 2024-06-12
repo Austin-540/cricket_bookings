@@ -93,8 +93,8 @@ class _BookingPageState extends State<BookingPage> {
     
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(onPressed: () async {
-        List<TimeSlot> tslots = await getTimeslots;
-        List<TimeSlot> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
+        List<dynamic> tslots = await getTimeslots;
+        List<dynamic> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
         if (selectedTimeslots.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
