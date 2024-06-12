@@ -98,7 +98,7 @@ class _BookingPageState extends State<BookingPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(children: [
-                Text("${snapshot.data[i].startTime} - ${snapshot.data[i].endTime} ${snapshot.data[i].am_or_pm}", style: const TextStyle(fontSize: 40),),
+                Text("${snapshot.data[i]['start_time']} - ${snapshot.data[i]['end_time']} ${snapshot.data[i]['am_or_pm']}", style: const TextStyle(fontSize: 40),),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -106,12 +106,12 @@ class _BookingPageState extends State<BookingPage> {
                     children: [
                       Checkbox(
                         
-                        value: checkboxesSelected[i], onChanged: snapshot.data[i].booked? null:(value){
+                        value: checkboxesSelected[i], onChanged: snapshot.data[i]['booked']? null:(value){
                           setState(() {
                             checkboxesSelected[i] = value!;
                           });
                       } ,),
-                      snapshot.data[i].booked? const Text("Booked"): const Text("Available")
+                      snapshot.data[i]['booked']? const Text("Booked"): const Text("Available")
                     ],
                   ),
                 )
