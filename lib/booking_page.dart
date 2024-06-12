@@ -155,7 +155,12 @@ class _BookingPageState extends State<BookingPage> {
           ]],
               );
             } else if (snapshot.hasError) {
-              return const Icon(Icons.error_outline);
+              return Column(
+                children: [
+                  const Icon(Icons.error_outline),
+                  Text(snapshot.error.toString())
+                ],
+              );
             }
             else {
               return const Center(child: CircularProgressIndicator());
