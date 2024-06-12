@@ -25,59 +25,25 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   List<bool> checkboxesSelected = [];
-  DateTime? datePicked = DateTime.now();
+  DateTime datePicked = DateTime.now();
   Future? getTimeslots;
 
   Future getTheTimeslots() async {
       if (! widget.selected) {
         return;
       }
-      final pbTimeslots = await pb.collection("timeslots").getFullList(sort: '-created');
-      checkboxesSelected = List.filled(pbTimeslots.length, false);
-      List<TimeSlot> formattedTimeslots = [];
-      for (final timeslot in pbTimeslots) {
-        formattedTimeslots.add(TimeSlot(
-          am_or_pm: timeslot.data['am_or_pm'],
-          booked: false, //defaults to false, gets changed to true later
-          startTime: timeslot.data['start_time'],
-          endTime: timeslot.data['end_time']
-        ));
-      }
+      var pbJSON = await pb.send("/api/shc/gettimeslots/${datePicked.day}/${datePicked.month}/${datePicked.year}");
+      List pbSlots = pbJSON['slots'];
 
-      formattedTimeslots.sort((a, b) => a.startTime.compareTo(b.startTime));
-      formattedTimeslots.sort((a, b) => a.am_or_pm.compareTo(b.am_or_pm));
-
-      final bookedSlots = await pb.collection('bookings').getFullList(
-        sort: '-created',
-        fields: "start_time"
-      );
-      try {
-      bookedSlots.removeWhere((element) => DateTime.parse(element.data['start_time']).day != datePicked!.day || DateTime.parse(element.data['start_time']).month != datePicked!.month);
-      } catch (_){
-      bookedSlots.removeWhere((element) => DateTime.parse(element.data['start_time']).day != DateTime.now().day || DateTime.parse(element.data['start_time']).month != DateTime.now().month);
-
-      }
-
-      Set<int> bookedTimesSet = {...bookedSlots.map((n) => DateTime.parse(n.data['start_time']).hour)};
-
-
-      for (final timeslot in formattedTimeslots) {
-        if (bookedTimesSet.contains(timeslot.startTime)) {
-          setState(() {
-          timeslot.booked = true;
-          });
-        } else if (bookedTimesSet.contains(timeslot.startTime + 12)) {
-          setState(() {
-            timeslot.booked = true;
-          });
-        }
-      }
+      pbSlots.sort((a, b) => a['start_time'].compareTo(b['start_time']));
+      pbSlots.sort((a, b) => a['am_or_pm'].compareTo(b['am_or_pm']));
 
       setState(() {
         widget.loadingAfterDateChange = false;
+        checkboxesSelected = List.filled(pbSlots.length, false);
       });
 
-      return formattedTimeslots;
+      return pbSlots;
       
       
   }
@@ -93,8 +59,8 @@ class _BookingPageState extends State<BookingPage> {
     
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(onPressed: () async {
-        List<TimeSlot> tslots = await getTimeslots;
-        List<TimeSlot> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
+        List<dynamic> tslots = await getTimeslots;
+        List<dynamic> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
         if (selectedTimeslots.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
@@ -132,7 +98,7 @@ class _BookingPageState extends State<BookingPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(children: [
-                Text("${snapshot.data[i].startTime} - ${snapshot.data[i].endTime} ${snapshot.data[i].am_or_pm}", style: const TextStyle(fontSize: 40),),
+                Text("${snapshot.data[i]['start_time']} - ${snapshot.data[i]['end_time']} ${snapshot.data[i]['am_or_pm']}", style: const TextStyle(fontSize: 40),),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -140,12 +106,12 @@ class _BookingPageState extends State<BookingPage> {
                     children: [
                       Checkbox(
                         
-                        value: checkboxesSelected[i], onChanged: snapshot.data[i].booked? null:(value){
+                        value: checkboxesSelected[i], onChanged: snapshot.data[i]['booked']? null:(value){
                           setState(() {
                             checkboxesSelected[i] = value!;
                           });
                       } ,),
-                      snapshot.data[i].booked? const Text("Booked"): const Text("Available")
+                      snapshot.data[i]['booked']? const Text("Booked"): const Text("Available")
                     ],
                   ),
                 )
@@ -155,7 +121,12 @@ class _BookingPageState extends State<BookingPage> {
           ]],
               );
             } else if (snapshot.hasError) {
-              return const Icon(Icons.error_outline);
+              return Column(
+                children: [
+                  const Icon(Icons.error_outline),
+                  Text(snapshot.error.toString())
+                ],
+              );
             }
             else {
               return const Center(child: CircularProgressIndicator());
