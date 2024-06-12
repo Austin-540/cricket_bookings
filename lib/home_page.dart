@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
 
         body: IndexedStack(index: currentPageIndex,
         children: [
-          const Placeholder(),
+          HomePagePage(selected: currentPageIndex==0?true:false,),
           BookingPage(selected: currentPageIndex==1?true:false),
           const Placeholder(),
           AccountPage(selected: currentPageIndex==3?true:false)
@@ -130,3 +130,52 @@ class _HomePageState extends State<HomePage> {
 }
 
 
+
+class HomePagePage extends StatefulWidget {
+  HomePagePage({super.key, required this.selected});
+  bool selected;
+
+  @override
+  State<HomePagePage> createState() => _HomePagePageState();
+}
+
+class _HomePagePageState extends State<HomePagePage> {
+
+  Future? upcomingBookings;
+
+  Future getUpcomingBookings() async {
+      return "";
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    upcomingBookings = getUpcomingBookings();
+  }
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.selected) {
+      return Text("Not selected");
+    }
+
+
+    return Scaffold(
+      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
+      body: Column(children: [
+        Text("Your upcoming bookings"),
+        FutureBuilder(
+          future: upcomingBookings,
+          // initialData: InitialData, //Maybe this line will be useful for a hero animation
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            return Column(children: [
+              Text(snapshot.data.toString())
+            ],);
+          },
+        ),
+      ],),
+
+    );
+  }
+}
