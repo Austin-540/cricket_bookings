@@ -7,7 +7,7 @@ import 'globals.dart';
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key, required this.timeslots, required this.date});
   final DateTime date;
-  final List<TimeSlot> timeslots;
+  final List<dynamic> timeslots;
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -57,9 +57,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
         body: Column(children: [
           for (int i = 0; i < widget.timeslots.length; i++) ... [
             Hero(
-              tag: "booking_time ${widget.timeslots[i].startTime}-${widget.timeslots[i].endTime}.${widget.date}",
+              tag: "booking_time ${widget.timeslots[i]['start_time']}-${widget.timeslots[i]['end_time']}.${widget.date}",
               child: Material(
-                child: Text("${widget.timeslots[i].startTime} - ${widget.timeslots[i].endTime} ${widget.timeslots[i].am_or_pm}", 
+                child: Text("${widget.timeslots[i]['start_time']} - ${widget.timeslots[i]['end_time']} ${widget.timeslots[i]['am_or_pm']}", 
                 style: const TextStyle(fontSize: 50),),
               ),
             ),
@@ -89,8 +89,8 @@ try {
                 
 final body = <String, dynamic>{
   "booker": pb.authStore.model.id,
-  "start_time": timeintToDateTime(timeslot.startTime, widget.date, timeslot.am_or_pm).toIso8601String(),
-  "end_time": timeintToDateTime(timeslot.endTime, widget.date, timeslot.am_or_pm).toIso8601String(),
+  "start_time": timeintToDateTime(timeslot['start_time'], widget.date, timeslot['am_or_pm']).toIso8601String(),
+  "end_time": timeintToDateTime(timeslot['end_time'], widget.date, timeslot['am_or_pm']).toIso8601String(),
   "cost": -1 //this number will be written by PB hooks to ensure bookings cannot be made without paying
   //the purpose of the cost field is to ensure any discounts are taken into account when issuing a refund
 };
