@@ -32,52 +32,18 @@ class _BookingPageState extends State<BookingPage> {
       if (! widget.selected) {
         return;
       }
-      final pbTimeslots = await pb.collection("timeslots").getFullList(sort: '-created');
-      checkboxesSelected = List.filled(pbTimeslots.length, false);
-      List<TimeSlot> formattedTimeslots = [];
-      for (final timeslot in pbTimeslots) {
-        formattedTimeslots.add(TimeSlot(
-          am_or_pm: timeslot.data['am_or_pm'],
-          booked: false, //defaults to false, gets changed to true later
-          startTime: timeslot.data['start_time'],
-          endTime: timeslot.data['end_time']
-        ));
-      }
+      final now = DateTime.now();
+      var pbJSON = await pb.send("/api/shc/gettimeslots/${now.day}/${now.month}/${now.year}");
+      List pbSlots = pbJSON['slots'];
 
-      formattedTimeslots.sort((a, b) => a.startTime.compareTo(b.startTime));
-      formattedTimeslots.sort((a, b) => a.am_or_pm.compareTo(b.am_or_pm));
-
-      final bookedSlots = await pb.collection('bookings').getFullList(
-        sort: '-created',
-        fields: "start_time"
-      );
-      try {
-      bookedSlots.removeWhere((element) => DateTime.parse(element.data['start_time']).day != datePicked!.day || DateTime.parse(element.data['start_time']).month != datePicked!.month);
-      } catch (_){
-      bookedSlots.removeWhere((element) => DateTime.parse(element.data['start_time']).day != DateTime.now().day || DateTime.parse(element.data['start_time']).month != DateTime.now().month);
-
-      }
-
-      Set<int> bookedTimesSet = {...bookedSlots.map((n) => DateTime.parse(n.data['start_time']).hour)};
-
-
-      for (final timeslot in formattedTimeslots) {
-        if (bookedTimesSet.contains(timeslot.startTime)) {
-          setState(() {
-          timeslot.booked = true;
-          });
-        } else if (bookedTimesSet.contains(timeslot.startTime + 12)) {
-          setState(() {
-            timeslot.booked = true;
-          });
-        }
-      }
+      pbSlots.sort((a, b) => a['start_time'].compareTo(b['start_time']));
+      pbSlots.sort((a, b) => a['am_or_pm'].compareTo(b['am_or_pm']));
 
       setState(() {
         widget.loadingAfterDateChange = false;
       });
 
-      return formattedTimeslots;
+      return pbSlots;
       
       
   }
