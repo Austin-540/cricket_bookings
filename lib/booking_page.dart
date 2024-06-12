@@ -32,8 +32,7 @@ class _BookingPageState extends State<BookingPage> {
       if (! widget.selected) {
         return;
       }
-      final now = DateTime.now();
-      var pbJSON = await pb.send("/api/shc/gettimeslots/${now.day}/${now.month}/${now.year}");
+      var pbJSON = await pb.send("/api/shc/gettimeslots/${datePicked.day}/${datePicked.month}/${datePicked.year}");
       List pbSlots = pbJSON['slots'];
 
       pbSlots.sort((a, b) => a['start_time'].compareTo(b['start_time']));
