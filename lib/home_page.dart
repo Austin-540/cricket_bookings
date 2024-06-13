@@ -224,7 +224,7 @@ class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
       child: Row(children: [
         Text("${parsedTime!.day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][parsedTime!.month-1]} ${parsedTime!.year}"),
         SizedBox(width: 30,),
-        Text("${parsedTime!.hour}:00"),
+        Text(parsedTime!.hour<12?"${parsedTime!.hour}:00 AM":"${parsedTime!.hour -12}:00 PM "),
         Spacer(),
         IconButton(onPressed: () => null, icon: Icon(Icons.more_vert))
       ],),
