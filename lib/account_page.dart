@@ -99,7 +99,13 @@ class _AccountPageState extends State<AccountPage> {
                                     child: Icon(Icons.account_balance_outlined),
                                   ),
                                   Text("\$${snapshot.data.data['balance']}"),
-                                  TextButton(onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context) => TopupPage())), child: Text("Redeem a topup code"))
+                                  TextButton(onPressed: () async {
+                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => TopupPage()));
+                                    setState(() {
+                                    getAccountDatas= getAccountData();
+                                    });
+                                  
+                                  }, child: Text("Redeem a topup code"))
                                 ],
                               ),
                             ),

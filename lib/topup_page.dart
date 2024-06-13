@@ -56,7 +56,8 @@ class _TopupPageState extends State<TopupPage> {
                 try {
                 final pbResponse = await pb.send("/api/shc/topup/usecode/${pb.authStore.model.id}", method: "POST", body: {"data": code});
                 print(pbResponse);
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
+                Navigator.pop(context);
+                Navigator.pop(context);
                 } catch (e) {
                   showDialog(context: context, builder: (context) =>AlertDialog(
                     title: Text("Something went wrong"),
