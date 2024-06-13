@@ -169,7 +169,7 @@ class _HomePagePageState extends State<HomePagePage> {
 
     return Scaffold(
       appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
-      body: Column(children: [
+      body: ListView(children: [
         Text("Your upcoming bookings"),
         FutureBuilder(
           future: upcomingBookings,
@@ -183,13 +183,49 @@ class _HomePagePageState extends State<HomePagePage> {
               for (int x = 0; x < snapshot.data.items.length; x++) ... [
                 Hero(
                   tag: "booking_time ${DateTime.parse(snapshot.data.items[x].data['start_time'])}",
-                  child: Text(snapshot.data.items[x].data['start_time'].toString()))
-              ]
+                  child: UpcomingBookingCard(time:snapshot.data.items[x].data['start_time']),
+            )],
             ],);
           },
         ),
       ],),
 
     );
+  }
+}
+
+class UpcomingBookingCard extends StatefulWidget {
+  const UpcomingBookingCard({
+    super.key, required this.time
+  });
+
+  final String time;
+
+  @override
+  State<UpcomingBookingCard> createState() => _UpcomingBookingCardState();
+}
+
+class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
+  DateTime? parsedTime;
+
+  @override
+  void initState() {
+    super.initState();
+    parsedTime= DateTime.parse(widget.time);
+    
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(children: [
+        Text("${parsedTime!.day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][parsedTime!.month-1]} ${parsedTime!.year}"),
+        SizedBox(width: 30,),
+        Text("${parsedTime!.hour}:00"),
+        Spacer(),
+        IconButton(onPressed: () => null, icon: Icon(Icons.more_vert))
+      ],),
+    ),);
   }
 }
