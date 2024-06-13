@@ -165,20 +165,20 @@ class _HomePagePageState extends State<HomePagePage> {
   @override
   Widget build(BuildContext context) {
     if (!widget.selected) {
-      return Text("Not selected");
+      return const Text("Not selected");
     }
 
 
     return Scaffold(
       appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary,),
       body: ListView(children: [
-        Text("Your upcoming bookings"),
+        const Text("Your upcoming bookings"),
         FutureBuilder(
           future: upcomingBookings,
           // initialData: InitialData, //Maybe this line will be useful for a hero animation
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator(),);
+              return const Center(child: CircularProgressIndicator(),);
             }
             return Column(children: [
 
@@ -223,10 +223,12 @@ class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
       padding: const EdgeInsets.all(8.0),
       child: Row(children: [
         Text("${parsedTime!.day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][parsedTime!.month-1]} ${parsedTime!.year}"),
-        SizedBox(width: 30,),
+        const SizedBox(width: 30,),
         Text(parsedTime!.hour<12?"${parsedTime!.hour}:00 AM":"${parsedTime!.hour -12}:00 PM "),
-        Spacer(),
-        IconButton(onPressed: () => null, icon: Icon(Icons.more_vert))
+        const Spacer(),
+        PopupMenuButton(itemBuilder: (context) => [
+          const PopupMenuItem(value:"Cancel", child: ListTile(leading: Icon(Icons.delete_outline), title: Text("Cancel Booking")))
+        ])
       ],),
     ),);
   }
