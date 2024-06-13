@@ -150,7 +150,9 @@ class _HomePagePageState extends State<HomePagePage> {
   filter: 'booker = "${pb.authStore.model.id}"',
 );
 
-      return resultList;
+  resultList.items.sort((a, b) => a.data['start_time'].compareTo(b.data['start_time']));
+
+      return resultList.items;
   }
 
 
@@ -180,10 +182,10 @@ class _HomePagePageState extends State<HomePagePage> {
             }
             return Column(children: [
 
-              for (int x = 0; x < snapshot.data.items.length; x++) ... [
+              for (int x = 0; x < snapshot.data.length; x++) ... [
                 Hero(
-                  tag: "booking_time ${DateTime.parse(snapshot.data.items[x].data['start_time'])}",
-                  child: UpcomingBookingCard(time:snapshot.data.items[x].data['start_time']),
+                  tag: "booking_time ${DateTime.parse(snapshot.data[x].data['start_time'])}",
+                  child: UpcomingBookingCard(time:snapshot.data[x].data['start_time']),
             )],
             ],);
           },
