@@ -185,7 +185,7 @@ class _HomePagePageState extends State<HomePagePage> {
               for (int x = 0; x < snapshot.data.length; x++) ... [
                 Hero(
                   tag: "booking_time ${DateTime.parse(snapshot.data[x].data['start_time'])}",
-                  child: UpcomingBookingCard(time:snapshot.data[x].data['start_time']),
+                  child: UpcomingBookingCard(time:snapshot.data[x].data['start_time'], bookingDetails: snapshot.data[x],),
             )],
             ],);
           },
@@ -198,10 +198,11 @@ class _HomePagePageState extends State<HomePagePage> {
 
 class UpcomingBookingCard extends StatefulWidget {
   const UpcomingBookingCard({
-    super.key, required this.time
+    super.key, required this.time, required this.bookingDetails
   });
 
   final String time;
+  final bookingDetails;
 
   @override
   State<UpcomingBookingCard> createState() => _UpcomingBookingCardState();
@@ -226,10 +227,58 @@ class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
         const SizedBox(width: 30,),
         Text(parsedTime!.hour<12?"${parsedTime!.hour}:00 AM":"${parsedTime!.hour -12}:00 PM "),
         const Spacer(),
-        PopupMenuButton(itemBuilder: (context) => [
+        PopupMenuButton(
+          onSelected: (item) => showDialog(barrierColor: const Color.fromARGB(51, 253, 17, 0),barrierDismissible: false,context: context, builder: (context) => CancelBookingDialog(details: widget.bookingDetails)),
+          itemBuilder: (context) => [
           const PopupMenuItem(value:"Cancel", child: ListTile(leading: Icon(Icons.delete_outline), title: Text("Cancel Booking")))
         ])
       ],),
     ),);
+  }
+}
+
+
+
+class CancelBookingDialog extends StatefulWidget {
+  const CancelBookingDialog({super.key, required this.details});
+  final details;
+
+  @override
+  State<CancelBookingDialog> createState() => _CancelBookingDialogState();
+}
+
+class _CancelBookingDialogState extends State<CancelBookingDialog> {
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Cancel this booking?"),
+      content: Text(widget.details.data['cost'] != 0?"You will be refunded \$${widget.details.data['cost']} onto your account balance.":""),
+      actions: [
+        !loading?TextButton(onPressed: () => Navigator.pop(context), child: const Text("Nevermind")): const SizedBox(),
+        TextButton(onPressed: () async {
+          if (loading) {
+            return;
+          }
+          setState(() {
+            loading = true;
+          });
+
+          try {
+          await pb.send("/api/shc/cancelbooking/${widget.details.id}");
+          await Future.delayed(const Duration(milliseconds: 500));
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
+          } catch (e) {
+            setState(() {
+              loading = false;
+            });
+            showDialog(context: context, builder: (context) => ErrorDialog(error: e));
+          }
+
+
+        }, child: loading?const CircularProgressIndicator(color: Colors.red,):const Text("Cancel it", style: TextStyle(color: Colors.red),),)
+      ],
+    );
   }
 }
