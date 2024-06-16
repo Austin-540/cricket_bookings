@@ -30,11 +30,16 @@ onRecordAfterCreateRequest((e) => {
     
     user_record.set("balance", balance-price)
     $app.dao().saveRecord(user_record)
+
+    record.set('cost', price)
+    $app.dao().saveRecord(record)
+
+    
 } catch (x) {
     $app.logger().error(x)
     $app.dao().deleteRecord(e.record)
-    $app.logger().info("Deleted a booking due to error")
-    throw new ForbiddenError("Something went wrong while booking", "The record couldn't be created")
+    $app.logger().info("Deleted a booking due to error", x)
+    throw x
 }
 }, "bookings")
 
