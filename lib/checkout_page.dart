@@ -83,6 +83,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
               });
 try {
 
+        final userRecord = await pb.collection('users').getOne(pb.authStore.model.id,
+        fields: "balance"
+);
+
+        var balance = userRecord.data['balance'];
+        if (await getPbPrices() > balance) {
+          throw "Balance is too low!";
+        }
+
 
               for (final timeslot in widget.timeslots) {
 
