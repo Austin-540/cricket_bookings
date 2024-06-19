@@ -140,7 +140,8 @@ class _BookingPageState extends State<BookingPage> {
               ],),
             ),
           )
-          ]],
+          ],
+          SizedBox(height: 80,)],
               );
             } else if (snapshot.hasError) {
               return Column(
