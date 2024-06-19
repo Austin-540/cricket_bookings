@@ -27,6 +27,24 @@ class _BookingPageState extends State<BookingPage> {
   List<bool> checkboxesSelected = [];
   DateTime datePicked = DateTime.now();
   Future? getTimeslots;
+  bool firstTimeOpened = true;
+
+  Future getDatePicked() async{
+    await Future.delayed(Duration(milliseconds: 100));
+    var datePickerPicked = await showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
+    if (datePickerPicked != null) {
+      setState(() {
+      datePicked = datePickerPicked;
+      widget.loadingAfterDateChange = true;
+      getTimeslots = getTheTimeslots();
+      });
+    }
+    
+  }
+
+
+
+
 
   Future getTheTimeslots() async {
       if (! widget.selected) {
@@ -53,6 +71,10 @@ class _BookingPageState extends State<BookingPage> {
   Widget build(BuildContext context) {
     if (!widget.selected) {
       return const Text("Not Selected! You should not see this screen!");
+    }
+    if (firstTimeOpened) {
+      getDatePicked();
+      firstTimeOpened = false;
     }
     getTimeslots ??= getTheTimeslots();
 
