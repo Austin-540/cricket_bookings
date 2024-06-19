@@ -114,7 +114,7 @@ class _BookingPageState extends State<BookingPage> {
             DateTime? datePickerPicked = await showDatePicker(
               context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
             setState(() {
-              datePicked = datePickerPicked ?? DateTime.now();
+              datePicked = datePickerPicked ?? datePicked;
               widget.loadingAfterDateChange = true;
               getTimeslots = getTheTimeslots();
             });
