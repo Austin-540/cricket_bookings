@@ -14,11 +14,19 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  var balance = -1;
 
   Future getPbPrices() async {
     final pbCosts = await pb.collection('prices').getFullList(
   sort: '-created',
 );
+
+    final userRecord = await pb.collection('users').getOne(pb.authStore.model.id,
+          fields: "balance"
+          );
+          setState(() {
+          balance = userRecord.data['balance'];
+          });
 
 
     //now get my account type
@@ -70,9 +78,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
             FutureBuilder(
               future: futureBldrData,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                return snapshot.hasData?Text("\$${snapshot.data*widget.timeslots.length}", style: const TextStyle(fontSize: 30)):const Text("Getting the cost...");
+                return snapshot.hasData?Text("\$${snapshot.data*widget.timeslots.length}", style: TextStyle(
+                  fontSize: 30, color: balance==-1? null: balance < snapshot.data*widget.timeslots.length? Colors.red:null)):
+                  const Text("Getting the cost...");
               },
             ),
+            Text(balance == -1?"Loading...":"Your balance: \$${balance}"),
           
               OutlinedButton(onPressed: ()async{
                 if (loading) {
