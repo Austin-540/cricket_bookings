@@ -126,10 +126,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 catch (e) {
                   setState(() {
                     loading = false;
-                    showDialog(context: context, builder: (context) => AlertDialog(
-                      title: const Text("Something went wrong"),
-                      content: Text(e.toString()),
-                    ));
+                    showDialog(context: context, builder: (context) => ErrorDialog(error: e));
                   });
                 }
                 

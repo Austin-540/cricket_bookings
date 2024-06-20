@@ -98,11 +98,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             loading = false;
             });
             if (!mounted) return;
-            showDialog(context: context, builder: (context) => AlertDialog(
-              title: Text("Something went wrong :/"),
-              content: Text(e.toString()),
-              actions: [TextButton(onPressed: (){Navigator.pop(context);}, child: Text("OK"))],
-            ));
+            showDialog(context: context, builder: (context) => ErrorDialog(error: e));
           }
           }
 
@@ -249,11 +245,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             setState(()=> loading = false);
             if (!mounted) return;
             showDialog(context: context, 
-            builder: (context) => AlertDialog(
-              title: Text("Something went wrong :/"),
-              content: Text(e.toString()),
-              actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text("OK"))],
-            ));
+            builder: (context) => ErrorDialog(error: e));
 
             
           }
