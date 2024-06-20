@@ -73,4 +73,4 @@ routerAdd("GET", "/api/shc/gettimeslots/:day/:month/:year", (c) => {
 
     return c.json(200, { "slots": final_final_list },)
 
-})
+}, $apis.activityLogger($app))
