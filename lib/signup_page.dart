@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shc_cricket_bookings/login_page.dart';
 import 'package:passkeys/authenticator.dart';
 import 'package:web_browser_detect/web_browser_detect.dart';
@@ -263,6 +264,14 @@ await pb.collection('users').create(
             "passwordConfirm": password,
           });
           await pb.collection('users').authWithPassword(widget.email, password);
+          const storage = FlutterSecureStorage();
+
+            final encoded = jsonEncode(<String, dynamic>{
+              "token": pb.authStore.token,
+              "model": pb.authStore.model,
+            });
+            await storage.write(key: "pb_auth", value: encoded);
+            if (!context.mounted) return;
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
           } catch (e) {
             setState(() {
