@@ -48,12 +48,21 @@ routerAdd("GET", "/api/shc/gettimeslotsmonth/:month/:year", (c) => {
             slotsMap[`${slot.getDateTime("start_time").time().day()}`] = [slot]
         }
     }
+
+
+    //now get the number of available slots per day
+
+    let newSlotsMap = {}
+
+    for (const day in slotsMap) {
+        newSlotsMap[day] = slotsMap[day].length
+    }
     
 
 
     
 
     
-    return c.json(200, { "slots": month_booked_slots, "map":slotsMap },)
+    return c.json(200, { 'newMap': newSlotsMap, "slotsAvailablePerDay":  timeslots_list.length},)
 
 }, $apis.activityLogger($app))
