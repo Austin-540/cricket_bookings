@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:shc_cricket_bookings/month_availability_view.dart';
+
 import 'booking_page.dart';
 import 'package:shc_cricket_bookings/login_page.dart';
 import 'account_page.dart';
@@ -121,7 +123,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           HomePagePage(selected: currentPageIndex==0?true:false,),
           BookingPage(selected: currentPageIndex==1?true:false),
-          const Placeholder(),
+          MonthAvailabilityView(selected: currentPageIndex==2?true:false),
           AccountPage(selected: currentPageIndex==3?true:false)
         ],),
 
