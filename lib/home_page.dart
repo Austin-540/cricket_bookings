@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
         body: IndexedStack(index: currentPageIndex,
         children: [
           HomePagePage(selected: currentPageIndex==0?true:false,),
-          BookingPage(selected: currentPageIndex==1?true:false),
+          BookingPage(selected: currentPageIndex==1?true:false, comingFromCalendarView: false, comingFromCalendarDate: null,),
           MonthAvailabilityView(selected: currentPageIndex==2?true:false),
           AccountPage(selected: currentPageIndex==3?true:false)
         ],),

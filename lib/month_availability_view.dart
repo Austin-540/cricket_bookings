@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shc_cricket_bookings/booking_page.dart';
 import 'globals.dart';
 import 'package:calendar_view/calendar_view.dart';
 
@@ -91,7 +92,19 @@ CalendarControllerProvider.of(context).controller.add(event);
             datePicked = date;
             getAvailabilityForTheMonth();
             });
-          },)
+          },
+
+          onCellTap: (events, date) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => BookingPage(selected: true, comingFromCalendarDate: date, comingFromCalendarView: true,)));
+            //add the ability to go to the selected date
+          },
+          onEventTap: (event, date) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => BookingPage(selected: true, comingFromCalendarDate: date, comingFromCalendarView: true,)));
+            //add the ability to go to the selected date
+          },
+          
+          
+          )
       
     );
   }
