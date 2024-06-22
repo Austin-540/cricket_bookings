@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           HomePagePage(selected: currentPageIndex==0?true:false,),
           BookingPage(selected: currentPageIndex==1?true:false),
-          CalendarControllerProvider(controller: EventController(),child:MonthAvailabilityView(selected: currentPageIndex==2?true:false)),
+          MonthAvailabilityView(selected: currentPageIndex==2?true:false),
           AccountPage(selected: currentPageIndex==3?true:false)
         ],),
 
