@@ -32,6 +32,9 @@ return daysInMonth[month - 1];
       if (response['newMap'].keys.contains(day.toString())) {
         
       } else {
+        if (DateTime(datePicked.year, datePicked.month, day).compareTo(DateTime.now()) > 0 || DateTime(datePicked.year, datePicked.month, day).compareWithoutTime(DateTime.now())) {
+
+        
       final event = CalendarEventData(
         title: "${response['slotsAvailablePerDay']}",
     date: DateTime(datePicked.year, datePicked.month, day),
@@ -40,12 +43,17 @@ return daysInMonth[month - 1];
     titleStyle: TextStyle(color: Colors.black)
 );
       CalendarControllerProvider.of(context).controller.add(event);
+        }
       }
     }
 
 
+
+
     response['newMap'].forEach((key, value) {
-      var colour = Colors.purple;
+       if (DateTime(datePicked.year, datePicked.month, int.parse(key)).compareTo(DateTime.now()) > 0 || DateTime(datePicked.year, datePicked.month, int.parse(key)).compareWithoutTime(DateTime.now())) {
+
+var colour = Colors.purple;
 
       if (response['slotsAvailablePerDay'] - value >= 6) {
         colour = Colors.green;
@@ -63,7 +71,9 @@ return daysInMonth[month - 1];
 );
 setState(() {
 CalendarControllerProvider.of(context).controller.add(event);
-});
+});}
+        
+      
 
     });
     return response;
@@ -95,13 +105,19 @@ CalendarControllerProvider.of(context).controller.add(event);
           },
 
           onCellTap: (events, date) {
+            if (date.compareTo(DateTime.now()) <= 0 && !date.compareWithoutTime(DateTime.now())) {
+              return;
+            }
             Navigator.push(context, MaterialPageRoute(builder: (context) => BookingPage(selected: true, comingFromCalendarDate: date, comingFromCalendarView: true,)));
-            //add the ability to go to the selected date
           },
           onEventTap: (event, date) {
+            if (date.compareTo(DateTime.now()) <= 0) {
+              return;
+            }
             Navigator.push(context, MaterialPageRoute(builder: (context) => BookingPage(selected: true, comingFromCalendarDate: date, comingFromCalendarView: true,)));
-            //add the ability to go to the selected date
           },
+
+          minMonth: DateTime.now(),
           
           
           )
