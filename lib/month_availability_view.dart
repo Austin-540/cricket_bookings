@@ -32,9 +32,11 @@ return daysInMonth[month - 1];
         
       } else {
       final event = CalendarEventData(
-        title: "${response['slotsAvailablePerDay']} Avaliable",
+        title: "${response['slotsAvailablePerDay']}",
     date: DateTime(datePicked.year, datePicked.month, day),
     event: "Event 1",
+    color: Colors.greenAccent,
+    titleStyle: TextStyle(color: Colors.black)
 );
       CalendarControllerProvider.of(context).controller.add(event);
       }
@@ -42,11 +44,21 @@ return daysInMonth[month - 1];
 
 
     response['newMap'].forEach((key, value) {
+      var colour = Colors.purple;
+
+      if (response['slotsAvailablePerDay'] - value >= 6) {
+        colour = Colors.green;
+      } else if (response['slotsAvailablePerDay'] - value >= 3) {
+        colour = Colors.orange;
+      } else {
+        colour = Colors.red;
+      }
       final day = int.parse(key);
       final event = CalendarEventData(
         title: "${response['slotsAvailablePerDay']-value} Avaliable",
     date: DateTime(datePicked.year, datePicked.month, day),
     event: "Event 1",
+    color: colour
 );
 setState(() {
 CalendarControllerProvider.of(context).controller.add(event);
