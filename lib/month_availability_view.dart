@@ -28,7 +28,7 @@ return daysInMonth[month - 1];
     final response =  await pb.send("/api/shc/gettimeslotsmonth/${datePicked.month}/${datePicked.year}");
     print(response);
 
-    for (var day in List.generate(getDaysInMonth(datePicked.year, datePicked.month), (i) => i)) {
+    for (var day in List.generate(getDaysInMonth(datePicked.year, datePicked.month), (i) => i+1)) {
       if (response['newMap'].keys.contains(day.toString())) {
         
       } else {
@@ -98,6 +98,7 @@ CalendarControllerProvider.of(context).controller.add(event);
       body: MonthView(
         cellAspectRatio: 0.9,
             onPageChange: (date, page) {
+              CalendarControllerProvider.of(context).controller.removeWhere((element) => true);
             setState(() {
             datePicked = date;
             getAvailabilityForTheMonth();
