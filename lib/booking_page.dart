@@ -122,6 +122,7 @@ class _BookingPageState extends State<BookingPage> {
             if (snapshot.hasData) {
               return Column(
                 children: [
+                  !widget.comingFromCalendarView?
                   ElevatedButton(onPressed: () async{
             DateTime? datePickerPicked = await showDatePicker(
               context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
@@ -130,7 +131,7 @@ class _BookingPageState extends State<BookingPage> {
               widget.loadingAfterDateChange = true;
               getTimeslots = getTheTimeslots();
             });
-          }, child: const Text("Pick a different date")),
+          }, child: const Text("Pick a different date")):SizedBox(),
           Text("Date selected: $datePicked"),
                   for (var i=0; i< snapshot.data.length; i++) ... [
               Card(
