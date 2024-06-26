@@ -96,6 +96,7 @@ CalendarControllerProvider.of(context).controller.add(event);
     }
     return Scaffold(
       body: MonthView(
+        initialMonth: datePicked,
         cellAspectRatio: 0.9,
             onPageChange: (date, page) {
               CalendarControllerProvider.of(context).controller.removeWhere((element) => true);
