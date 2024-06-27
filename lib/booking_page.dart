@@ -65,7 +65,7 @@ class _BookingPageState extends State<BookingPage> {
 
 
   Future getTheTimeslots() async {
-      appBarTitle = "${datePicked.day}-${datePicked.month}-${datePicked.year}";
+      appBarTitle = "${datePicked!.day}-${datePicked!.month}-${datePicked!.year}";
       if (! widget.selected) {
         return;
       }
@@ -105,7 +105,7 @@ class _BookingPageState extends State<BookingPage> {
         if (selectedTimeslots.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked!)));
         }
 
       }, label: const Text("Checkout"), icon: const Icon(Icons.shopping_cart_outlined),),
