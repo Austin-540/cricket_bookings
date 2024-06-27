@@ -1,3 +1,4 @@
+import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 
@@ -11,11 +12,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorSchemeSeed: Colors.blue
+    return CalendarControllerProvider(
+      controller: EventController(),
+      child: MaterialApp(
+        theme: ThemeData(
+          colorSchemeSeed: Colors.blue
+        ),
+        home: const LoginPage(defaultEmail: null,)
       ),
-      home: const LoginPage(defaultEmail: null,)
     );
   }
 }
