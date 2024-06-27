@@ -49,7 +49,7 @@ void main() {
       await tester.pumpAndSettle();
 
 
-      expect(find.byType(TextFormField), findsNWidgets(2)); //check the popup was cleared
+      expect(find.textContaining("OK"), findsNothing); //check the popup was cleared
 
 
 
