@@ -13,6 +13,7 @@ class MonthAvailabilityView extends StatefulWidget {
 
 class _MonthAvailabilityViewState extends State<MonthAvailabilityView> {
   DateTime datePicked = DateTime.now();
+  double ratio = 1;
 
   int getDaysInMonth(int year, int month) {
 if (month == DateTime.february) {
@@ -91,13 +92,14 @@ CalendarControllerProvider.of(context).controller.add(event);
 
   @override
   Widget build(BuildContext context) {
+    ratio = MediaQuery.sizeOf(context).width/500;
     if (!widget.selected) {
       return SizedBox();
     }
     return Scaffold(
       body: MonthView(
         initialMonth: datePicked,
-        cellAspectRatio: 0.9,
+        cellAspectRatio: ratio,
             onPageChange: (date, page) {
               CalendarControllerProvider.of(context).controller.removeWhere((element) => true);
             setState(() {
