@@ -14,9 +14,11 @@ class TimeSlot {
 }
 
 class BookingPage extends StatefulWidget {
-  BookingPage({super.key, required this.selected});
+  BookingPage({super.key, required this.selected, required this.comingFromCalendarView, required this.comingFromCalendarDate});
   bool selected;
   bool loadingAfterDateChange = false;
+  final bool comingFromCalendarView;
+  final DateTime? comingFromCalendarDate;
   
 
   @override
@@ -25,14 +27,29 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   List<bool> checkboxesSelected = [];
-  DateTime datePicked = DateTime.now();
+  DateTime? datePicked;
   Future? getTimeslots;
   bool firstTimeOpened = true;
   String appBarTitle = "Book a timeslot";
 
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.comingFromCalendarView) {
+      datePicked = DateTime.now();
+    } else {
+      datePicked = widget.comingFromCalendarDate;
+    }
+  }
+
   Future getDatePicked() async{
     await Future.delayed(Duration(milliseconds: 100));
-    var datePickerPicked = await showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
+    DateTime? datePickerPicked;
+    if (!widget.comingFromCalendarView){
+    datePickerPicked = await showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
+    } else {
+      datePickerPicked = widget.comingFromCalendarDate;
+    }
     if (datePickerPicked != null) {
       setState(() {
       datePicked = datePickerPicked;
@@ -48,11 +65,11 @@ class _BookingPageState extends State<BookingPage> {
 
 
   Future getTheTimeslots() async {
-      appBarTitle = "${datePicked.day}-${datePicked.month}-${datePicked.year}";
+      appBarTitle = "${datePicked!.day}-${datePicked!.month}-${datePicked!.year}";
       if (! widget.selected) {
         return;
       }
-      var pbJSON = await pb.send("/api/shc/gettimeslots/${datePicked.day}/${datePicked.month}/${datePicked.year}");
+      var pbJSON = await pb.send("/api/shc/gettimeslots/${datePicked!.day}/${datePicked!.month}/${datePicked!.year}");
       List pbSlots = pbJSON['slots'];
 
       pbSlots.sort((a, b) => a['start_time'].compareTo(b['start_time']));
@@ -88,7 +105,7 @@ class _BookingPageState extends State<BookingPage> {
         if (selectedTimeslots.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked!)));
         }
 
       }, label: const Text("Checkout"), icon: const Icon(Icons.shopping_cart_outlined),),
@@ -108,6 +125,7 @@ class _BookingPageState extends State<BookingPage> {
             if (snapshot.hasData) {
               return Column(
                 children: [
+                  !widget.comingFromCalendarView?
                   ElevatedButton.icon(
                     icon: Icon(Icons.calendar_month_outlined),
                     onPressed: () async{
@@ -118,7 +136,7 @@ class _BookingPageState extends State<BookingPage> {
               widget.loadingAfterDateChange = true;
               getTimeslots = getTheTimeslots();
             });
-          }, label: const Text("Pick a different date")),
+          }, label: const Text("Pick a different date")):SizedBox(),
                   for (var i=0; i< snapshot.data.length; i++) ... [
               Card(
             child: Padding(
