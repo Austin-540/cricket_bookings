@@ -30,6 +30,7 @@ class _BookingPageState extends State<BookingPage> {
   DateTime? datePicked;
   Future? getTimeslots;
   bool firstTimeOpened = true;
+  String appBarTitle = "Book a timeslot";
 
   @override
   void initState() {
@@ -64,6 +65,7 @@ class _BookingPageState extends State<BookingPage> {
 
 
   Future getTheTimeslots() async {
+      appBarTitle = "${datePicked.day}-${datePicked.month}-${datePicked.year}";
       if (! widget.selected) {
         return;
       }
@@ -103,12 +105,13 @@ class _BookingPageState extends State<BookingPage> {
         if (selectedTimeslots.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked!)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked)));
         }
 
       }, label: const Text("Checkout"), icon: const Icon(Icons.shopping_cart_outlined),),
       appBar: AppBar(
-        title: const Text("Book a timeslot"),
+        leading: Icon(Icons.calendar_today_outlined),
+        title: Text(appBarTitle),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: ListView(
@@ -123,16 +126,17 @@ class _BookingPageState extends State<BookingPage> {
               return Column(
                 children: [
                   !widget.comingFromCalendarView?
-                  ElevatedButton(onPressed: () async{
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.calendar_month_outlined),
+                    onPressed: () async{
             DateTime? datePickerPicked = await showDatePicker(
               context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
             setState(() {
-              datePicked = datePickerPicked ?? DateTime.now();
+              datePicked = datePickerPicked ?? datePicked;
               widget.loadingAfterDateChange = true;
               getTimeslots = getTheTimeslots();
             });
-          }, child: const Text("Pick a different date")):SizedBox(),
-          Text("Date selected: $datePicked"),
+          }, label: const Text("Pick a different date")):SizedBox(),
                   for (var i=0; i< snapshot.data.length; i++) ... [
               Card(
             child: Padding(
@@ -158,7 +162,8 @@ class _BookingPageState extends State<BookingPage> {
               ],),
             ),
           )
-          ]],
+          ],
+          SizedBox(height: 80,)],
               );
             } else if (snapshot.hasError) {
               return Column(

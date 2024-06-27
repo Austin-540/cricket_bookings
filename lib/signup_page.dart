@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shc_cricket_bookings/login_page.dart';
 import 'package:passkeys/authenticator.dart';
@@ -167,34 +168,14 @@ class _SignupPageFormState extends State<SignupPageForm> {
               setState(()=> loading = false);
               if (!context.mounted) return;
               if (dontShowErrorBecauseSafari) return;
-              showDialog(context: context, 
-              builder: (context) => AlertDialog(
-                title: const Text("Something went wrong creating your passkey :/"),
-                content: Text("${e.toString()}\n\nYou can either try again or use a password. If you do not create a passkey now, you will only be able to use a password to login."),
-                actions: [TextButton(onPressed: ()async{
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
-                        }, child: const Text("Set a password")),
-                  TextButton(onPressed: ()async {
-                  try {
-                    await attemptMakePasskey(username, true);
-                  } catch (e) {
-                    try {
-                    await pb.send("/api/shc/delete_account_after_passkey_failed/$username");
-                    } catch (_){}
-                    if (!context.mounted) return;
-                    showDialog(context: context, builder: (context) => 
-                    AlertDialog(title: const Text("That didn't work again :/",),
-                    content: const Text("You will need to make a password."),
-                    actions: [
-                      TextButton(onPressed: ()async{
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SetPasswordPage(email: email, username: username,)), (route) => false);
-                        
-                        
-                        }, child: const Text("OK"))
-                    ],));
-                  }
-                  }, child: const Text("Try again"))],
-              ));
+              
+              if (e is PasskeyAuthCancelledException) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordPage(username: username, email: email, passkeyFailedBecause: "Cancelled")));
+              } else if (e is PlatformException){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordPage(username: username, email: email, passkeyFailedBecause: "Platform Exception")));
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordPage(username: username, email: email, passkeyFailedBecause: "Other")));
+              }
       
               
             }
@@ -220,9 +201,10 @@ class _SignupPageFormState extends State<SignupPageForm> {
 }
 
 class SetPasswordPage extends StatefulWidget {
-  const SetPasswordPage({super.key, required this.username, required this.email});
+  const SetPasswordPage({super.key, required this.username, required this.email, required this.passkeyFailedBecause});
     final String username;
   final String email;
+  final String passkeyFailedBecause;
 
   @override
   State<SetPasswordPage> createState() => _SetPasswordPageState();
@@ -277,14 +259,15 @@ await pb.collection('users').create(
             setState(() {
             loading = false;
             });
-            showDialog(context: context, builder: (context)=> AlertDialog(
-              title: const Text("Something went wrong :/"),
-              content: Text(e.toString()),
-            ));
+            showDialog(context: context, builder: (context)=> ErrorDialog(error: e));
           }
           
           
-        }, child: loading? const CircularProgressIndicator():const Text("Set password"))
+        }, child: loading? const CircularProgressIndicator():const Text("Set password")),
+
+        widget.passkeyFailedBecause == "Cancelled"? const Center(child: Text("We attempted to make a passkey for your account, but your browser is saying you pressed cancel. Please set a password instead.")):
+        widget.passkeyFailedBecause == "Platform Exception"? const Center(child: Text("Your device doesn't support passkeys. Please set a password instead.")):
+        const Center(child: Text("Something went wrong creating your passkey. Please make a password instead"))
         
       ],),
     );
