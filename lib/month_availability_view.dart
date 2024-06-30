@@ -3,6 +3,7 @@ import 'package:shc_cricket_bookings/booking_page.dart';
 import 'globals.dart';
 import 'package:calendar_view/calendar_view.dart';
 
+// ignore: must_be_immutable
 class MonthAvailabilityView extends StatefulWidget {
   MonthAvailabilityView({super.key, required this.selected});
   bool selected;
@@ -27,7 +28,6 @@ return daysInMonth[month - 1];
 
   Future getAvailabilityForTheMonth() async {
     final response =  await pb.send("/api/shc/gettimeslotsmonth/${datePicked.month}/${datePicked.year}");
-    print(response);
 
     for (var day in List.generate(getDaysInMonth(datePicked.year, datePicked.month), (i) => i+1)) {
       if (response['newMap'].keys.contains(day.toString())) {
@@ -41,8 +41,9 @@ return daysInMonth[month - 1];
     date: DateTime(datePicked.year, datePicked.month, day),
     event: "Event 1",
     color: Colors.greenAccent,
-    titleStyle: TextStyle(color: Colors.black)
+    titleStyle: const TextStyle(color: Colors.black)
 );
+if (!mounted) return;
       CalendarControllerProvider.of(context).controller.add(event);
         }
       }
@@ -94,7 +95,7 @@ CalendarControllerProvider.of(context).controller.add(event);
   Widget build(BuildContext context) {
     ratio = MediaQuery.sizeOf(context).width/500;
     if (!widget.selected) {
-      return SizedBox();
+      return const SizedBox();
     }
     return Scaffold(
       body: MonthView(

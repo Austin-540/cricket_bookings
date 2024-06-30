@@ -1,6 +1,4 @@
 import 'package:shc_cricket_bookings/home_page.dart';
-
-import 'booking_page.dart';
 import 'package:flutter/material.dart';
 import 'globals.dart';
 
@@ -48,6 +46,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     futureBldrData = getPbPrices();
   }
 
+  // ignore: non_constant_identifier_names
   DateTime timeintToDateTime(int time, DateTime date, String am_or_pm) {
     return DateTime(
       date.year,
@@ -83,7 +82,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   const Text("Getting the cost...");
               },
             ),
-            Text(balance == -1?"Loading...":"Your balance: \$${balance}"),
+            Text(balance == -1?"Loading...":"Your balance: \$$balance"),
           
               OutlinedButton(onPressed: ()async{
                 if (loading) {
@@ -116,11 +115,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
             //the purpose of the cost field is to ensure any discounts are taken into account when issuing a refund
           };
           
-          final record = await pb.collection('bookings').create(body: body);
+          await pb.collection('bookings').create(body: body);
           setState(() {
           loading = false;
           
           });
+          if (!context.mounted) return;
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false,);
                 }}
                 catch (e) {

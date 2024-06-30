@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:calendar_view/calendar_view.dart';
 import 'package:shc_cricket_bookings/month_availability_view.dart';
 
 import 'booking_page.dart';
@@ -57,12 +56,14 @@ class _HomePageState extends State<HomePage> {
             fields: "verified"
           );
           if (verified.data['verified']) {
+            if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Thanks for verifying your email :)"))
             );
             Navigator.pop(context);
           }
           else {
+            if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Your email isn't verified!"))
             );
@@ -77,8 +78,10 @@ class _HomePageState extends State<HomePage> {
         final String? email = pb.authStore.model.data['email'];
         await const FlutterSecureStorage().delete(key: "pb_auth");
         pb.authStore.clear();
+        if (!mounted) return;
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: email)), (route) => false);
       } else {
+        if (!mounted) return;
       showDialog(context: context, builder: (context) => AlertDialog(
         title: const Text("Something went wrong logging in"),
         content: Text("${e.toString()}\n\nYou can either log out or try refreshing"),
@@ -134,6 +137,7 @@ class _HomePageState extends State<HomePage> {
 
 
 
+// ignore: must_be_immutable
 class HomePagePage extends StatefulWidget {
   HomePagePage({super.key, required this.selected});
   bool selected;
@@ -205,7 +209,7 @@ class UpcomingBookingCard extends StatefulWidget {
   });
 
   final String time;
-  final bookingDetails;
+  final RecordModel bookingDetails;
 
   @override
   State<UpcomingBookingCard> createState() => _UpcomingBookingCardState();
@@ -244,7 +248,7 @@ class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
 
 class CancelBookingDialog extends StatefulWidget {
   const CancelBookingDialog({super.key, required this.details});
-  final details;
+  final RecordModel details;
 
   @override
   State<CancelBookingDialog> createState() => _CancelBookingDialogState();
@@ -271,6 +275,7 @@ class _CancelBookingDialogState extends State<CancelBookingDialog> {
           try {
           await pb.send("/api/shc/cancelbooking/${widget.details.id}");
           await Future.delayed(const Duration(milliseconds: 500));
+          if (!context.mounted) return;
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
           } catch (e) {
             setState(() {

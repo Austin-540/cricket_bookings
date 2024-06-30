@@ -4,9 +4,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shc_cricket_bookings/main.dart' as app;
 import 'dart:io';
-import 'package:pocketbase/pocketbase.dart';
-import 'dart:math';
-
 
 void main() {
   String password = File("/Users/austin/Programming/cricket_bookings/integration_test/password.txt").readAsLinesSync()[0];
@@ -47,7 +44,7 @@ void main() {
 
       await tester.tap(find.text("OK"));
       await tester.pumpAndSettle();
-      await tester.pump(Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
 
 
       await tester.pumpAndSettle();
@@ -59,7 +56,7 @@ void main() {
       await tester.tap(find.text("Checkout"));
       await tester.pumpAndSettle();
 
-      await Future.delayed(Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 5));
       await tester.pumpAndSettle();
 
       expect(find.textContaining("\$10"), findsOne);
@@ -70,10 +67,10 @@ void main() {
 
       final listOfMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"];
 
-      expect(find.textContaining("27 ${listOfMonths[DateTime.now().month]}"), findsOne);
+      expect(find.textContaining("27 ${listOfMonths[DateTime.now().month]}"), findsOne); //includes the -1 that is normally necessary for list stuff
       //Made a booking and now back to the home page
 
-      await tester.pump(Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
 
       await tester.tap(find.byIcon(Icons.more_horiz).first);
       await tester.pumpAndSettle();
@@ -82,7 +79,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.tap(find.text("Cancel it"));
-      await tester.pump(Duration(seconds: 10));
+      await tester.pump(const Duration(seconds: 10));
       await tester.pumpAndSettle();
 
 

@@ -1,9 +1,5 @@
-import 'package:flutter/widgets.dart';
-import 'package:shc_cricket_bookings/home_page.dart';
-
 import 'globals.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
 
 class TopupPage extends StatefulWidget {
   const TopupPage({super.key});
@@ -39,7 +35,7 @@ class _TopupPageState extends State<TopupPage> {
   return fullChecksum.substring(fullChecksum.length-3).toUpperCase();
 }
 
-    TextEditingController _controller = TextEditingController();
+    final TextEditingController _controller = TextEditingController();
 
 
 
@@ -89,11 +85,11 @@ class _TopupPageState extends State<TopupPage> {
               setState(() {
                 error = Column(
                   children: [
-                    Center(child: Text("This code isn't valid. Check you have entered everything correctly.")),
-                    TextButton(child: Text("What does this mean?"), onPressed: ()=>showDialog(context: context, builder: (context) => AlertDialog(
-                      title: Text("What does this error mean?"),
-                      content: Text("The last 3 digits of your topup code are used to check that the first 13 were entered correctly. The last 3 digits you entered don't match the first 13.\n\nYou should double check the code if you typed it in."),
-                      actions: [TextButton(child: Text("OK"), onPressed: ()=>Navigator.pop(context),)],
+                    const Center(child: Text("This code isn't valid. Check you have entered everything correctly.")),
+                    TextButton(child: const Text("What does this mean?"), onPressed: ()=>showDialog(context: context, builder: (context) => AlertDialog(
+                      title: const Text("What does this error mean?"),
+                      content: const Text("The last 3 digits of your topup code are used to check that the first 13 were entered correctly. The last 3 digits you entered don't match the first 13.\n\nYou should double check the code if you typed it in."),
+                      actions: [TextButton(child: const Text("OK"), onPressed: ()=>Navigator.pop(context),)],
                     )),)
                   ],
                 );
@@ -115,23 +111,24 @@ class _TopupPageState extends State<TopupPage> {
                 }
 
             try {
-            final code_data = await pb.send("/api/shc/topup/getdetails", body: {"data": code.substring(0,13)}, method: "POST");
-              final email_data = await pb.collection('users').getOne(pb.authStore.model.id,
+            final codeData = await pb.send("/api/shc/topup/getdetails", body: {"data": code.substring(0,13)}, method: "POST");
+              final emailData = await pb.collection('users').getOne(pb.authStore.model.id,
               fields: "email"
     );
-              if (code_data['redeemed'] == true) {
+              if (codeData['redeemed'] == true) {
                 throw "This code has already been redeemed";
               }
+              if (!context.mounted) return;
             showDialog(
               barrierDismissible: false,
               context: context, builder: (context) => AlertDialog(
-              title: Text("Redeem this \$${code_data['value']} code?"),
-              content: Text("It will be added to your account (${email_data.data['email']})"),
+              title: Text("Redeem this \$${codeData['value']} code?"),
+              content: Text("It will be added to your account (${emailData.data['email']})"),
               actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: const Text("Nevermind")),
               TextButton(onPressed: () async {
                 try {
-                final pbResponse = await pb.send("/api/shc/topup/usecode/${pb.authStore.model.id}", method: "POST", body: {"data": code.substring(0,13)});
-                print(pbResponse);
+                await pb.send("/api/shc/topup/usecode/${pb.authStore.model.id}", method: "POST", body: {"data": code.substring(0,13)});
+                if (!context.mounted) return;
                 Navigator.pop(context);
                 Navigator.pop(context);
                 } catch (e) {

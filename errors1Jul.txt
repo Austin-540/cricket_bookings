@@ -1,0 +1,70 @@
+Analyzing cricket_bookings...
+
+warning - integration_test/login_and_signup_test.dart:7:8 - Unused import: 'package:pocketbase/pocketbase.dart'. Try removing the import directive. - unused_import
+warning - integration_test/make_a_booking_test.dart:7:8 - Unused import: 'package:pocketbase/pocketbase.dart'. Try removing the import directive. - unused_import
+warning - integration_test/make_a_booking_test.dart:8:8 - Unused import: 'dart:math'. Try removing the import directive. - unused_import
+warning - lib/account_page.dart:9:7 - This class (or a class that this class inherits from) is marked as '@immutable', but one or more of its instance fields aren't final: AccountPage.selected - must_be_immutable
+warning - lib/booking_page.dart:16:7 - This class (or a class that this class inherits from) is marked as '@immutable', but one or more of its instance fields aren't final: BookingPage.selected, BookingPage.loadingAfterDateChange - must_be_immutable
+warning - lib/checkout_page.dart:3:8 - Unused import: 'booking_page.dart'. Try removing the import directive. - unused_import
+warning - lib/checkout_page.dart:119:17 - The value of the local variable 'record' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib/home_page.dart:2:8 - Unused import: 'package:calendar_view/calendar_view.dart'. Try removing the import directive. - unused_import
+warning - lib/home_page.dart:137:7 - This class (or a class that this class inherits from) is marked as '@immutable', but one or more of its instance fields aren't final: HomePagePage.selected - must_be_immutable
+warning - lib/month_availability_view.dart:6:7 - This class (or a class that this class inherits from) is marked as '@immutable', but one or more of its instance fields aren't final: MonthAvailabilityView.selected - must_be_immutable
+warning - lib/signup_page.dart:83:25 - The value of the local variable 'relyingPartyServerRes' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib/topup_page.dart:2:8 - Unused import: 'package:shc_cricket_bookings/home_page.dart'. Try removing the import directive. - unused_import
+warning - lib/topup_page.dart:6:8 - Unused import: 'dart:convert'. Try removing the import directive. - unused_import
+   info - integration_test/login_and_signup_test.dart:41:28 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - integration_test/login_and_signup_test.dart:99:28 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - integration_test/login_and_signup_test.dart:103:28 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - integration_test/make_a_booking_test.dart:50:25 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - integration_test/make_a_booking_test.dart:62:28 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - integration_test/make_a_booking_test.dart:76:25 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - integration_test/make_a_booking_test.dart:85:25 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/account_page.dart:103:107 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/account_page.dart:108:45 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/booking_page.dart:46:26 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/booking_page.dart:49:45 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/booking_page.dart:106:32 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/booking_page.dart:108:24 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/booking_page.dart:113:18 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/booking_page.dart:130:27 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/booking_page.dart:139:58 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/booking_page.dart:166:11 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/checkout_page.dart:51:62 - The variable name 'am_or_pm' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - non_constant_identifier_names
+   info - lib/checkout_page.dart:86:62 - Unnecessary braces in a string interpolation. Try removing the braces. - unnecessary_brace_in_string_interps
+   info - lib/checkout_page.dart:124:40 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/globals.dart:9:9 - An uninitialized field should have an explicit type annotation. Try adding a type annotation. - prefer_typing_uninitialized_variables
+   info - lib/home_page.dart:60:34 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/home_page.dart:63:27 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/home_page.dart:66:34 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/home_page.dart:80:38 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/home_page.dart:82:18 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/home_page.dart:208:9 - An uninitialized field should have an explicit type annotation. Try adding a type annotation. - prefer_typing_uninitialized_variables
+   info - lib/home_page.dart:247:9 - An uninitialized field should have an explicit type annotation. Try adding a type annotation. - prefer_typing_uninitialized_variables
+   info - lib/home_page.dart:274:40 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/home_page.dart:279:24 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/login_page.dart:82:19 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib/month_availability_view.dart:30:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib/month_availability_view.dart:44:17 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/month_availability_view.dart:46:37 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/month_availability_view.dart:97:14 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/reset_password_page.dart:39:22 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/reset_password_page.dart:46:24 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/topup_page.dart:1:8 - The import of 'package:flutter/widgets.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib/topup_page.dart:42:27 - The private field _controller could be 'final'. Try making the field 'final'. - prefer_final_fields
+   info - lib/topup_page.dart:92:21 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/topup_page.dart:92:35 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/topup_page.dart:93:39 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/topup_page.dart:94:30 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/topup_page.dart:95:32 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/topup_page.dart:96:51 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/topup_page.dart:118:19 - The variable name 'code_data' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - non_constant_identifier_names
+   info - lib/topup_page.dart:119:21 - The variable name 'email_data' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - non_constant_identifier_names
+   info - lib/topup_page.dart:127:15 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/topup_page.dart:134:17 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib/topup_page.dart:135:31 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/topup_page.dart:136:31 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/topup_page.dart:138:30 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib/topup_page.dart:146:26 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+
+66 issues found.
