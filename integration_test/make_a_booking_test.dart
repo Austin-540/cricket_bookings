@@ -71,6 +71,24 @@ void main() {
       final listOfMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"];
 
       expect(find.textContaining("27 ${listOfMonths[DateTime.now().month]}"), findsOne);
+      //Made a booking and now back to the home page
+
+      await tester.pump(Duration(seconds: 1));
+
+      await tester.tap(find.byIcon(Icons.more_horiz).first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text("Cancel it"));
+      await tester.pump(Duration(seconds: 10));
+      await tester.pumpAndSettle();
+
+
+
+      expect(find.textContaining("Something went wrong"), findsNothing);
+      //expect that there is no error dialog open
 
 
 
