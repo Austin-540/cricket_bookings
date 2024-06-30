@@ -80,7 +80,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
                     timeout: webAuthnChallenge['publicKey']['timeout'],  excludeCredentials: [],
                     attestation: "none"));
                   // finish sign up by calling the relying party server again
-                  final relyingPartyServerRes = await pb.send(
+                  await pb.send(
                     "/webauthn-finish-registration/${base64.encode(utf8.encode(username))}", method: "POST", body: {
                       "id": platformRes.id,
                       "rawId": platformRes.rawId,

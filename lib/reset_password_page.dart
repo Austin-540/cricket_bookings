@@ -36,6 +36,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           if (email == "") return;
           try {
           await pb.collection('users').requestPasswordReset(email);
+          if (!context.mounted) return;
           showDialog(context: context,
              builder: (context) => AlertDialog(
               title: const Text("Check your emails"),

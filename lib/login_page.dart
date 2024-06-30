@@ -79,7 +79,6 @@ class _LoginPageFormState extends State<LoginPageForm> {
                     
                   }
                   );
-                  print(res);
                   final storage = FlutterSecureStorage();
                   pb.authStore.save(res['token'], res['user']);
                   final encoded = jsonEncode(<String, dynamic>{

@@ -4,7 +4,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shc_cricket_bookings/main.dart' as app;
 import 'dart:io';
-import 'package:pocketbase/pocketbase.dart';
 import 'dart:math';
 
 
@@ -38,7 +37,7 @@ void main() {
       await tester.tap(loginButton);
       
       await tester.pumpAndSettle();
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
 
       expect(find.textContaining("Something went wrong"), findsOneWidget);
 
@@ -49,7 +48,7 @@ void main() {
       await tester.pumpAndSettle();
 
 
-      expect(find.byType(TextFormField), findsNWidgets(2)); //check the popup was cleared
+      expect(find.textContaining("OK"), findsNothing); //check the popup was cleared
 
 
 
@@ -96,11 +95,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      await Future.delayed(Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 3));
 
       expect(find.byIcon(Icons.home_outlined), findsOne);
 
-      await Future.delayed(Duration(seconds: 10));
+      await Future.delayed(const Duration(seconds: 10));
       await tester.pump();
       expect(find.textContaining("You're almost done"), findsOne);
 

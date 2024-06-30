@@ -6,6 +6,7 @@ import 'globals.dart';
 import 'package:flutter/material.dart';
 import 'topup_page.dart';
 
+// ignore: must_be_immutable
 class AccountPage extends StatefulWidget {
   AccountPage({super.key, required this.selected});
   bool? selected;
@@ -100,12 +101,12 @@ class _AccountPageState extends State<AccountPage> {
                                   ),
                                   Text("\$${snapshot.data.data['balance']}"),
                                   TextButton(onPressed: () async {
-                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => TopupPage()));
+                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => const TopupPage()));
                                     setState(() {
                                     getAccountDatas= getAccountData();
                                     });
                                   
-                                  }, child: Text("Redeem a topup code"))
+                                  }, child: const Text("Redeem a topup code"))
                                 ],
                               ),
                             ),

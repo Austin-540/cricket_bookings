@@ -6,7 +6,7 @@ final pb = PocketBase("https://pb.shccricket.com/");
 
 class ErrorDialog extends StatelessWidget {
   const ErrorDialog({super.key, required this.error});
-  final error;
+  final Object error;
 
   @override
   Widget build(BuildContext context) {
