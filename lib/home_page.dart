@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Thanks for verifying your email :)"))
             );
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
           }
           else {
             if (!context.mounted) return;
