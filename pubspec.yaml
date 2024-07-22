@@ -14,6 +14,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   passkeys: ^2.0.8
   pocketbase: ^0.18.1
+  url_launcher: ^6.3.0
   web_browser_detect: ^2.0.3
 
 dev_dependencies:

@@ -187,7 +187,8 @@ class _HomePagePageState extends State<HomePagePage> {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator(),);
             }
-            return Column(children: [
+            return Column(children: 
+            [
 
               for (int x = 0; x < snapshot.data.length; x++) ... [
                 Hero(

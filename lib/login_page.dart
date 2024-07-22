@@ -10,6 +10,7 @@ import 'globals.dart';
 import 'reset_password_page.dart';
 import 'signup_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key, required this.defaultEmail});
@@ -210,6 +211,8 @@ class _LoginPageFormState extends State<LoginPageForm> {
         
 
         FilledButton.tonal(onPressed: () async {
+          if (loading) return;
+
           if (email == "") return;
 
           if (password == "") {
@@ -223,6 +226,7 @@ class _LoginPageFormState extends State<LoginPageForm> {
             loading = true;
           });
 
+          
         
           try{
             await pb.collection('users').authWithPassword(
@@ -241,6 +245,18 @@ class _LoginPageFormState extends State<LoginPageForm> {
 
 
           } catch (e) {
+            try{
+              await pb.admins.authWithPassword(email, password);
+              setState(() {
+              loading = false;
+              });
+              showDialog(context: context, builder: (context) => AlertDialog(
+                title: Text("This is an admin account"),
+                content: Text("You need to go to the admin UI to use this account"),
+                actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text("Nevermind")), TextButton(onPressed: () {launchUrl(Uri.parse("https://austin-540.github.io/shc-cricket-admin-ui-pages/"));}, child: Text("OK (Launch URL)"))],
+              ));
+              return;
+            } catch (_) {}
             setState(()=> loading = false);
             if (!mounted) return;
             showDialog(context: context, 
