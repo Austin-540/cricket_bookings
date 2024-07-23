@@ -105,21 +105,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
           
           
                 for (final timeslot in widget.timeslots) {
+
+                  await pb.send("/api/shc/make_a_booking/${timeintToDateTime(timeslot['start_time'], widget.date, timeslot['am_or_pm']).toIso8601String()}/${timeintToDateTime(timeslot['end_time'], widget.date, timeslot['am_or_pm']).toIso8601String()}",
+                  method: "POST");
           
                   
-          final body = <String, dynamic>{
-            "booker": pb.authStore.model.id,
-            "start_time": timeintToDateTime(timeslot['start_time'], widget.date, timeslot['am_or_pm']).toIso8601String(),
-            "end_time": timeintToDateTime(timeslot['end_time'], widget.date, timeslot['am_or_pm']).toIso8601String(),
-            "cost": -1 //this number will be written by PB hooks to ensure bookings cannot be made without paying
-            //the purpose of the cost field is to ensure any discounts are taken into account when issuing a refund
-          };
+          // final body = <String, dynamic>{
+          //   "booker": pb.authStore.model.id,
+          //   "start_time": timeintToDateTime(timeslot['start_time'], widget.date, timeslot['am_or_pm']).toIso8601String(),
+          //   "end_time": timeintToDateTime(timeslot['end_time'], widget.date, timeslot['am_or_pm']).toIso8601String(),
+          //   "cost": -1 //this number will be written by PB hooks to ensure bookings cannot be made without paying
+          //   //the purpose of the cost field is to ensure any discounts are taken into account when issuing a refund
+          // };
           
-          await pb.collection('bookings').create(body: body);
-          setState(() {
-          loading = false;
+          // await pb.collection('bookings').create(body: body);
+          // setState(() {
+          // loading = false;
           
-          });
+          // });
           if (!context.mounted) return;
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false,);
                 }}
