@@ -15,6 +15,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   var balance = -1;
 
   Future getPbPrices() async {
+    //get the prices for the currently logged in price
     final pbCosts = await pb.collection('prices').getFullList(
   sort: '-created',
 );
@@ -90,7 +91,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 } //This means that pressing the button multiple times will not make multiple bookings
                 
                 setState(() {
-                loading = true;
+                loading = true; //show the loading circle
                 });
           try {
           
@@ -101,6 +102,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           var balance = userRecord.data['balance'];
           if (await getPbPrices() > balance) {
             throw "Balance is too low!";
+            //secondary to the check on the server side, not a security issue
           }
           
           
@@ -124,6 +126,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           
           // });
           if (!context.mounted) return;
+
+          //go to home page without allowing to go back
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false,);
                 }}
                 catch (e) {

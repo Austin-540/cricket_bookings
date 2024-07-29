@@ -68,7 +68,7 @@ var colour = Colors.purple;
       final event = CalendarEventData(
         title: "${response['slotsAvailablePerDay']-value} Avaliable",
     date: DateTime(datePicked.year, datePicked.month, day),
-    event: "Event 1",
+    event: "Slots",
     color: colour
 );
 setState(() {

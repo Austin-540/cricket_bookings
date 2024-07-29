@@ -37,8 +37,10 @@ class _BookingPageState extends State<BookingPage> {
   void initState() {
     super.initState();
     if (!widget.comingFromCalendarView) {
+      //if opened through the bottom nav bar the default dateTime is now
       datePicked = DateTime.now();
     } else {
+      //otherwise its the date from the calendar view
       datePicked = widget.comingFromCalendarDate;
     }
   }
@@ -53,6 +55,7 @@ class _BookingPageState extends State<BookingPage> {
       datePickerPicked = widget.comingFromCalendarDate;
     }
     if (datePickerPicked != null) {
+      //if datePickerPicked is null then the variable the UI uses to show the date (datePicked) isn't updated
       setState(() {
       datePicked = datePickerPicked;
       widget.loadingAfterDateChange = true;
@@ -67,6 +70,7 @@ class _BookingPageState extends State<BookingPage> {
 
 
   Future getTheTimeslots() async {
+    //appBarTitle is (D)D-(M)M-YYYY format
       appBarTitle = "${datePicked!.day}-${datePicked!.month}-${datePicked!.year}";
       if (! widget.selected) {
         return;
@@ -76,6 +80,7 @@ class _BookingPageState extends State<BookingPage> {
 
       pbSlots.sort((a, b) => a['start_time'].compareTo(b['start_time']));
       pbSlots.sort((a, b) => a['am_or_pm'].compareTo(b['am_or_pm']));
+      //sort the timeslots by start_time then am_or_pm
 
       setState(() {
         widget.loadingAfterDateChange = false;
@@ -106,9 +111,11 @@ class _BookingPageState extends State<BookingPage> {
         List<dynamic> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
         if (selectedTimeslots.isEmpty) {
           if (!context.mounted) return;
+          //check that at least 1 timeslot is selected
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
           if (!context.mounted) return;
+          //go to checkout page
         Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked!)));
         }
 
@@ -156,6 +163,7 @@ class _BookingPageState extends State<BookingPage> {
                         
                         value: checkboxesSelected[i], onChanged: snapshot.data[i]['booked']? null:(value){
                           setState(() {
+                            //update the checkboxes list
                             checkboxesSelected[i] = value!;
                           });
                       } ,),
