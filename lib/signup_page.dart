@@ -245,6 +245,7 @@ await pb.collection('users').create(
             "password": password,
             "passwordConfirm": password,
           });
+          //make the user, then auth with it so that the token can be saved.
           await pb.collection('users').authWithPassword(widget.email, password);
           const storage = FlutterSecureStorage();
 

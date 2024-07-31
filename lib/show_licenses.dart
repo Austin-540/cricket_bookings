@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 void showLicenses(context) {
   LicenseRegistry.addLicense(() => Stream<LicenseEntry>.value(
+    // Because I copied the code for the loading icon when using Flutter Web, I need to include the license
     const LicenseEntryWithLineBreaks(<String>['HTML Loading Icon'], '''
 Copyright (c) 2024 by John Heiner (https://codepen.io/johnheiner/pen/BNLzbJ)
 

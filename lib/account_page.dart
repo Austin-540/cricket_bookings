@@ -20,16 +20,19 @@ class _AccountPageState extends State<AccountPage> {
 
 
   Future getAccountData() async{ 
+  // Fetch account data from PB
   final data = await pb.collection('users').getOne(pb.authStore.model.id,
     expand: 'permissions',
-    // fields: 'email, pfp, permissions.name, webauthn_id_b64'
-    );
+  );
 
-    if (data.data['webauthn_id_b64'] != null && data.data['webauthn_id_b64'] != "") {
-      hasPasskey = true;
-    }
-    return data;
+  // Check if the user has a passkey
+  if (data.data['webauthn_id_b64'] != null && data.data['webauthn_id_b64'] != "") {
+    hasPasskey = true;
   }
+
+
+  return data;
+}
   Future? getAccountDatas;
   
 

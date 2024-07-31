@@ -42,76 +42,97 @@ class LoginPageForm extends StatefulWidget {
 
 class _LoginPageFormState extends State<LoginPageForm> {
 
-  Future passkeyLogin()async{
-            try {
+  Future passkeyLogin() async {
+    try {
+      // Replace @ with __at__ in the username
+      final username = email.replaceAll(RegExp(r"@"), "__at__");
 
-            
-            final username = email.replaceAll(RegExp(r"@"), "__at__");
-                              final passkeyAuthenticator = PasskeyAuthenticator();
-                  final webAuthnChallenge = await pb.send("/webauthn-begin-login/${base64.encode(utf8.encode(username))}", method: "POST");
-                  final platformRes = await passkeyAuthenticator.authenticate(
-                    AuthenticateRequestType(
-                    relyingPartyId: webAuthnChallenge['publicKey']['rpId'], 
-                    challenge: webAuthnChallenge['publicKey']['challenge'], 
-                    timeout: webAuthnChallenge['publicKey']['timeout'], 
-                    userVerification: "preferred", 
-                    allowCredentials: [
-                      CredentialType(
-                      type: webAuthnChallenge['publicKey']['allowCredentials'][0]['type'], 
-                      id: webAuthnChallenge['publicKey']['allowCredentials'][0]['id'], 
-                      transports: []
-                      )
-                      ], 
-                    mediation: MediationType.Optional));
-                  final res = await pb.send("/webauthn-finish-login/${base64.encode(utf8.encode(username))}", method: "POST", 
-                  body: {
-                    "type": "public-key",
-                    "authenticatorAttachment": "cross-platform",
-                    "clientExtensionResults": {},
-                    "id": platformRes.userHandle,
-                    "rawId": platformRes.rawId,
-                    "response": {
-                      "authenticatorData": platformRes.authenticatorData,
-                      "clientDataJSON": platformRes.clientDataJSON,
-                      "signature": platformRes.signature,
-                      "userHandle": platformRes.userHandle
-                    }
-                    
-                    
-                  }
-                  );
-                  final storage = FlutterSecureStorage();
-                  pb.authStore.save(res['token'], res['user']);
-                  final encoded = jsonEncode(<String, dynamic>{
-              "token": pb.authStore.token,
-              "model": pb.authStore.model,
-            });
-            await storage.write(key: "pb_auth", value: encoded);
-            if (pb.authStore.model['signup_finished'] == false){
-                await pb.collection('users').update(pb.authStore.model['id'], body: {"signup_finised": true});
-            }
-            if (!mounted) return;
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
-          } 
-          catch (e) {
-            setState(() {
-            loading = false;
-            });
-            if (!mounted) return;
-            showDialog(context: context, builder: (context) => ErrorDialog(error: e));
-          }
-          }
+      // Begin webauthn login and get challenge
+      final webAuthnChallenge = await pb.send(
+        "/webauthn-begin-login/${base64.encode(utf8.encode(username))}",
+        method: "POST",
+      );
 
+      final passkeyAuthenticator = PasskeyAuthenticator();
+      final platformRes = await passkeyAuthenticator.authenticate( //use the Platform passkey authenticator
+        AuthenticateRequestType(
+          relyingPartyId: webAuthnChallenge['publicKey']['rpId'],
+          challenge: webAuthnChallenge['publicKey']['challenge'],
+          timeout: webAuthnChallenge['publicKey']['timeout'],
+          userVerification: "preferred",
+          allowCredentials: [
+            CredentialType(
+              type: webAuthnChallenge['publicKey']['allowCredentials'][0]['type'],
+              id: webAuthnChallenge['publicKey']['allowCredentials'][0]['id'],
+              transports: [],
+            ),
+          ],
+          mediation: MediationType.Optional,
+        ),
+      );
+
+      // Finish webauthn login
+      final res = await pb.send(
+        "/webauthn-finish-login/${base64.encode(utf8.encode(username))}",
+        method: "POST",
+        body: {
+          "type": "public-key",
+          "authenticatorAttachment": "cross-platform",
+          "clientExtensionResults": {},
+          "id": platformRes.userHandle,
+          "rawId": platformRes.rawId,
+          "response": {
+            "authenticatorData": platformRes.authenticatorData,
+            "clientDataJSON": platformRes.clientDataJSON,
+            "signature": platformRes.signature,
+            "userHandle": platformRes.userHandle,
+          },
+        },
+      );
+
+      // Save token and user model in PB auth store
+      final storage = FlutterSecureStorage();
+      pb.authStore.save(res['token'], res['user']);
+
+      // Save auth data to storage
+      final encoded = jsonEncode(<String, dynamic>{
+        "token": pb.authStore.token,
+        "model": pb.authStore.model,
+      });
+      await storage.write(key: "pb_auth", value: encoded);
+
+      // Update signup_finished status
+      if (pb.authStore.model['signup_finished'] == false) {
+        await pb.collection('users').update(pb.authStore.model['id'], body: {"signup_finised": true});
+      }
+
+      // Navigate to home page without ability to return
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
+      if (!mounted) return;
+      showDialog(context: context, builder: (context) => ErrorDialog(error: e));
+    }
+  }
+
+  //check if the user login data is already in storage
   Future tryLogIn() async {
     const storage = FlutterSecureStorage();
-    // ignore: non_constant_identifier_names
+    // Read the stored authentication data from storage
     final String? pb_auth = await storage.read(key: "pb_auth");
     if (pb_auth != null) {
+      // Decode the stored data
       final decoded = jsonDecode(pb_auth);
       final token = (decoded as Map<String, dynamic>)["token"] as String? ?? "";
       final model = RecordModel.fromJson(
-        decoded["model"] as Map<String, dynamic>? ?? {});
+        decoded["model"] as Map<String, dynamic>? ?? {}
+      );
+      // Save the authentication data in the auth store
       pb.authStore.save(token, model);
+      // Navigate to the home page without the ability to return
       if (!mounted) return;
       Navigator.pushAndRemoveUntil(context, _createRoute(), (route) => false);
     }
@@ -210,70 +231,75 @@ class _LoginPageFormState extends State<LoginPageForm> {
 
         
 
-        FilledButton.tonal(onPressed: () async {
-          if (loading) return;
+        // Login button
+        FilledButton.tonal(
+          onPressed: () async {
+            if (loading) return;
 
-          if (email == "") return;
+            if (email == "") return;
 
-          if (password == "") {
+            if (password == "") {
               setState(() {
-            loading = true;
-          });
-            await passkeyLogin();
-            return;
-          }
-            setState(() {
-            loading = true;
-          });
-
-          
-        
-          try{
-            await pb.collection('users').authWithPassword(
-           email, password,
-          );
-
-          const storage = FlutterSecureStorage();
-
-            final encoded = jsonEncode(<String, dynamic>{
-              "token": pb.authStore.token,
-              "model": pb.authStore.model,
-            });
-            await storage.write(key: "pb_auth", value: encoded);
-            if (!context.mounted) return;
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomePage()));
-
-
-          } catch (e) {
-            try{
-              await pb.admins.authWithPassword(email, password);
-              setState(() {
-              loading = false;
+                loading = true;
               });
-              showDialog(context: context, builder: (context) => AlertDialog(
-                title: Text("This is an admin account"),
-                content: Text("You need to go to the admin UI to use this account"),
-                actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text("Nevermind")), TextButton(onPressed: () {launchUrl(Uri.parse("https://austin-540.github.io/shc-cricket-admin-ui-pages/"));}, child: Text("OK (Launch URL)"))],
-              ));
+              await passkeyLogin();
               return;
-            } catch (_) {}
-            setState(()=> loading = false);
-            if (!mounted) return;
-            showDialog(context: context, 
-            builder: (context) => ErrorDialog(error: e));
+            }
+            setState(() {
+              loading = true;
+            });
 
-            
-          }
-          
+            try {
+              // Authenticate to PB with password
+              await pb.collection('users').authWithPassword(email, password);
 
-          }, 
-          child: loading? Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(),
-          ): Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("Login"),
-          )),
+              // Save authentication data to storage
+              const storage = FlutterSecureStorage();
+              final encoded = jsonEncode(<String, dynamic>{
+                "token": pb.authStore.token,
+                "model": pb.authStore.model,
+              });
+              await storage.write(key: "pb_auth", value: encoded);
+
+              // Navigate to home page if login was successful
+              if (!context.mounted) return;
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+            } catch (e) {
+              try {
+                // Try to authenticate with admin password
+                await pb.admins.authWithPassword(email, password);
+                setState(() {
+                  loading = false;
+                });
+                // Show dialog for admin account if the password used was for an admin account
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text("This is an admin account"),
+                    content: Text("You need to go to the admin UI to use this account"),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context), child: Text("Nevermind")),
+                      TextButton(onPressed: () {launchUrl(Uri.parse("https://austin-540.github.io/shc-cricket-admin-ui-pages/"));}, child: Text("OK (Launch URL)"))
+                    ],
+                  ),
+                );
+                return;
+              } catch (_) {}
+              setState(() => loading = false);
+              if (!mounted) return;
+              showDialog(context: context, builder: (context) => ErrorDialog(error: e));
+            }
+          },
+          child: loading
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Login"),
+                ),
+        ),
           TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));}, child: Text("Forgot my password or my passkey isn't working")),
           Text("OR"),
       ],

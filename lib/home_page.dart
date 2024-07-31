@@ -20,61 +20,70 @@ class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
   
 
+  // Function to set up PocketBase authentication
   Future setupPBAuth() async {
+    // Read the pb_auth data
     final String? pbAuth = await const FlutterSecureStorage().read(key: "pb_auth");
     if (pbAuth != null) {
+      // Decode the token and extract it to PB auth store
       final decoded = jsonDecode(pbAuth);
       final token = (decoded as Map<String, dynamic>)["token"] as String? ?? "";
-      final model = RecordModel.fromJson(
-        decoded["model"] as Map<String, dynamic>? ?? {});
-      pb.authStore.save(token, model);}
+      final model = RecordModel.fromJson(decoded["model"] as Map<String, dynamic>? ?? {});
+      pb.authStore.save(token, model);
+    }
   }
+
+  // Function to check if the user is verified
   Future checkVerified() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    try{
-      final record = await pb.collection('users').getOne(pb.authStore.model.id,
-  fields: "email, verified"
-);
+    try {
+      // Get the user record
+      final record = await pb.collection('users').getOne(pb.authStore.model.id, fields: "email, verified");
 
-  if (!record.data['verified']){
-    await pb.collection('users').requestVerification(record.data['email']);
-    if (!mounted) return;
-    showDialog(context: context,
-    barrierDismissible: false,
-     builder: (context) => AlertDialog(
-      title: const Text("You're almost done"),
-      content: const Text("You have been sent a link to verify your email. You cannot continue without doing this step."),
-      actions: [
-        TextButton(onPressed: (){
-          pb.authStore.clear();
-          const FlutterSecureStorage().delete(key: "pb_auth");
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
-        }, child: const Text("Log out")),
-        TextButton(onPressed: () async {  
-          final verified = await pb.collection('users').getOne(
-            pb.authStore.model.id,
-            fields: "verified"
-          );
-          if (verified.data['verified']) {
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Thanks for verifying your email :)"))
-            );
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
-          }
-          else {
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Your email isn't verified!"))
-            );
-          }
-        }, child: const Text("Done"))
-      ],
-     ));
-
-  }
-    } catch(e) {
+      if (!record.data['verified']) {
+        // If the user is not verified, request verification and show a dialog
+        await pb.collection('users').requestVerification(record.data['email']);
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text("You're almost done"),
+            content: const Text("You have been sent a link to verify your email. You cannot continue without doing this step."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Log out the user and navigate to the login page
+                  pb.authStore.clear();
+                  const FlutterSecureStorage().delete(key: "pb_auth");
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
+                },
+                child: const Text("Log out"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  // Check if the user is verified after a delay
+                  final verified = await pb.collection('users').getOne(pb.authStore.model.id, fields: "verified");
+                  if (verified.data['verified']) {
+                    if (!context.mounted) return;
+                    // Show a snackbar and navigate to the home page if their account is verified in PB
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Thanks for verifying your email :)")));
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomePage()), (route) => false);
+                  } else {
+                    if (!context.mounted) return;
+                    // Show a snackbar if the email is not verified just in case someone clicked the button without actually verifying their email
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Your email isn't verified!")));
+                  }
+                },
+                child: const Text("Done"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
       if (!pb.authStore.isValid) {
+        // If the auth store is not valid, log out the user and navigate to the login page
         final String? email = pb.authStore.model.data['email'];
         await const FlutterSecureStorage().delete(key: "pb_auth");
         pb.authStore.clear();
@@ -82,19 +91,27 @@ class _HomePageState extends State<HomePage> {
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage(defaultEmail: email)), (route) => false);
       } else {
         if (!mounted) return;
-      showDialog(context: context, builder: (context) => AlertDialog(
-        title: const Text("Something went wrong logging in"),
-        content: Text("${e.toString()}\n\nYou can either log out or try refreshing"),
-        actions: [TextButton(onPressed: () {
-          pb.authStore.clear();
-        const FlutterSecureStorage().delete(key: "pb_auth");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
-        }, child: const Text("Log Out"))],
-      ));
+        // Show an error dialog if something went wrong logging in
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Something went wrong logging in"),
+            content: Text("${e.toString()}\n\nYou can either log out or try refreshing"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Log out the user and navigate to the login page
+                  pb.authStore.clear();
+                  const FlutterSecureStorage().delete(key: "pb_auth");
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage(defaultEmail: null,)), (route) => false);
+                },
+                child: const Text("Log Out"),
+              ),
+            ],
+          ),
+        );
       }
     }
-  
-
   }
 
   @override
@@ -108,6 +125,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //Main navigation bar at the bottom of the page
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int i) {
             setState(() {
@@ -125,7 +143,9 @@ class _HomePageState extends State<HomePage> {
 
         body: IndexedStack(index: currentPageIndex,
         children: [
+          //the weird trinary thing is used to maintain state but not render the pages all the time
           HomePagePage(selected: currentPageIndex==0?true:false,),
+          //coming from calendar view is null because we are not coming from the calendar view when entering through the bottom nav bar
           BookingPage(selected: currentPageIndex==1?true:false, comingFromCalendarView: false, comingFromCalendarDate: null,),
           MonthAvailabilityView(selected: currentPageIndex==2?true:false),
           AccountPage(selected: currentPageIndex==3?true:false)
@@ -157,6 +177,7 @@ class _HomePagePageState extends State<HomePagePage> {
   filter: 'booker = "${pb.authStore.model.id}"',
 );
 
+    //sort the bookings by start time
   resultList.items.sort((a, b) => a.data['start_time'].compareTo(b.data['start_time']));
 
       return resultList.items;
@@ -182,7 +203,7 @@ class _HomePagePageState extends State<HomePagePage> {
         const Text("Your upcoming bookings"),
         FutureBuilder(
           future: upcomingBookings,
-          // initialData: InitialData, //Maybe this line will be useful for a hero animation
+          // initialData: InitialData, //Maybe this line will be useful for a hero animation //it wasn't
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator(),);
@@ -191,10 +212,7 @@ class _HomePagePageState extends State<HomePagePage> {
             [
 
               for (int x = 0; x < snapshot.data.length; x++) ... [
-                Hero(
-                  tag: "booking_time ${DateTime.parse(snapshot.data[x].data['start_time'])}",
-                  child: UpcomingBookingCard(time:snapshot.data[x].data['start_time'], bookingDetails: snapshot.data[x],),
-            )],
+                UpcomingBookingCard(time:snapshot.data[x].data['start_time'], bookingDetails: snapshot.data[x],)],
             ],);
           },
         ),
@@ -231,8 +249,10 @@ class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
     return Card(child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(children: [
+        //convert the integer month to a string for humans to understand
         Text("${parsedTime!.day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][parsedTime!.month-1]} ${parsedTime!.year}"),
         const SizedBox(width: 30,),
+        //check for PM to turn it into 12hr time
         Text(parsedTime!.hour<12?"${parsedTime!.hour}:00 AM":"${parsedTime!.hour -12}:00 PM "),
         const Spacer(),
         PopupMenuButton(
@@ -270,6 +290,7 @@ class _CancelBookingDialogState extends State<CancelBookingDialog> {
             return;
           }
           setState(() {
+            //show the loading spinner
             loading = true;
           });
 

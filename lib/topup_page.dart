@@ -5,6 +5,7 @@ class TopupPage extends StatefulWidget {
   const TopupPage({super.key});
 
     String addDashes(String text) {
+      //Format the text as AAAA-AAAA-AAAA-AAAA
   String formattedText = '';
   for (int i = 0; i < text.length; i++) {
     if (i > 0 && i % 4 == 0 && i < 16) {
@@ -25,6 +26,7 @@ class _TopupPageState extends State<TopupPage> {
   
 
   String checksum(String s) {
+    //same checksum code as in the JS
   var chk = 0x12345678;
   final len = s.length;
   for (var i = 0; i < len; i++) {
@@ -64,8 +66,8 @@ class _TopupPageState extends State<TopupPage> {
               
             ),
             onChanged: (text) { 
-            var sanitizedText = text.replaceAll('-', '');
-            sanitizedText = sanitizedText.replaceAll(' ', '');
+            var sanitizedText = text.replaceAll('-', ''); //get rid of any dashes before submitting the code to the backend
+            sanitizedText = sanitizedText.replaceAll(' ', ''); //get rid of all spaces
             sanitizedText = sanitizedText.toUpperCase();
             code = sanitizedText;
             if (sanitizedText.length == 16) {
@@ -112,6 +114,7 @@ class _TopupPageState extends State<TopupPage> {
 
             try {
             final codeData = await pb.send("/api/shc/topup/getdetails", body: {"data": code.substring(0,13)}, method: "POST");
+            //get the amount of the topup code
               final emailData = await pb.collection('users').getOne(pb.authStore.model.id,
               fields: "email"
     );
@@ -128,6 +131,7 @@ class _TopupPageState extends State<TopupPage> {
               TextButton(onPressed: () async {
                 try {
                 await pb.send("/api/shc/topup/usecode/${pb.authStore.model.id}", method: "POST", body: {"data": code.substring(0,13)});
+                //use the topup code, but don't send the checksum with it
                 if (!context.mounted) return;
                 Navigator.pop(context);
                 Navigator.pop(context);

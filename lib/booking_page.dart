@@ -9,38 +9,37 @@ class TimeSlot {
     final int endTime;
     bool booked;
     // ignore: non_constant_identifier_names
-    final String am_or_pm;
+    final String am_or_pm; // either "AM" or "PM" or "Noon"
 
 }
 
 // ignore: must_be_immutable
 class BookingPage extends StatefulWidget {
   BookingPage({super.key, required this.selected, required this.comingFromCalendarView, required this.comingFromCalendarDate});
-  bool selected;
+  bool selected; // determines if the loading spinner is shown
   bool loadingAfterDateChange = false;
   final bool comingFromCalendarView;
   final DateTime? comingFromCalendarDate;
-  
 
   @override
   State<BookingPage> createState() => _BookingPageState();
 }
 
 class _BookingPageState extends State<BookingPage> {
-  List<bool> checkboxesSelected = [];
+  List<bool> checkboxesSelected = []; // initialise List of selected checkboxes
   DateTime? datePicked;
   Future? getTimeslots;
   bool firstTimeOpened = true;
-  String appBarTitle = "Book a timeslot";
+  String appBarTitle = "Book a timeslot"; // The default title of the app bar, can be dynamically changed
 
   @override
   void initState() {
     super.initState();
     if (!widget.comingFromCalendarView) {
-      //if opened through the bottom nav bar the default dateTime is now
+      // If opened through the bottom nav bar, the default dateTime is now
       datePicked = DateTime.now();
     } else {
-      //otherwise its the date from the calendar view
+      // Otherwise its the date from the calendar view
       datePicked = widget.comingFromCalendarDate;
     }
   }
@@ -50,27 +49,22 @@ class _BookingPageState extends State<BookingPage> {
     DateTime? datePickerPicked;
     if (!widget.comingFromCalendarView){
       if (!mounted) return;
-    datePickerPicked = await showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
+      datePickerPicked = await showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime(DateTime.now().year+2));
     } else {
       datePickerPicked = widget.comingFromCalendarDate;
     }
     if (datePickerPicked != null) {
-      //if datePickerPicked is null then the variable the UI uses to show the date (datePicked) isn't updated
+      // If datePickerPicked is null, then the variable the UI uses to show the date (datePicked) isn't updated
       setState(() {
       datePicked = datePickerPicked;
       widget.loadingAfterDateChange = true;
       getTimeslots = getTheTimeslots();
       });
     }
-    
   }
 
-
-
-
-
   Future getTheTimeslots() async {
-    //appBarTitle is (D)D-(M)M-YYYY format
+    // appBarTitle is (D)D-(M)M-YYYY format
       appBarTitle = "${datePicked!.day}-${datePicked!.month}-${datePicked!.year}";
       if (! widget.selected) {
         return;
@@ -80,7 +74,7 @@ class _BookingPageState extends State<BookingPage> {
 
       pbSlots.sort((a, b) => a['start_time'].compareTo(b['start_time']));
       pbSlots.sort((a, b) => a['am_or_pm'].compareTo(b['am_or_pm']));
-      //sort the timeslots by start_time then am_or_pm
+      // Sort the timeslots by start_time then am_or_pm, resulting in an overall sort of earliest to latest
 
       setState(() {
         widget.loadingAfterDateChange = false;
@@ -88,10 +82,7 @@ class _BookingPageState extends State<BookingPage> {
       });
 
       return pbSlots;
-      
-      
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -104,21 +95,19 @@ class _BookingPageState extends State<BookingPage> {
     }
     getTimeslots ??= getTheTimeslots();
 
-    
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(onPressed: () async {
         List<dynamic> tslots = await getTimeslots;
         List<dynamic> selectedTimeslots =tslots.where((timeSlot) => checkboxesSelected[tslots.indexOf(timeSlot)]).toList();
         if (selectedTimeslots.isEmpty) {
           if (!context.mounted) return;
-          //check that at least 1 timeslot is selected
+          // If the user hasn't selected any timeslots, dont let them checkout
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need to select at least 1 timeslot"),));
         } else {
           if (!context.mounted) return;
-          //go to checkout page
+          // Go to checkout page
         Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(timeslots: selectedTimeslots, date: datePicked!)));
         }
-
       }, label: const Text("Checkout"), icon: const Icon(Icons.shopping_cart_outlined),),
       appBar: AppBar(
         leading: const Icon(Icons.calendar_today_outlined),
@@ -127,7 +116,6 @@ class _BookingPageState extends State<BookingPage> {
       ),
       body: ListView(
         children: [
-          
           FutureBuilder(future: getTimeslots, 
           builder: (context, snapshot) {
             if (widget.loadingAfterDateChange) {
@@ -160,10 +148,9 @@ class _BookingPageState extends State<BookingPage> {
                   child: Column(
                     children: [
                       Checkbox(
-                        
                         value: checkboxesSelected[i], onChanged: snapshot.data[i]['booked']? null:(value){
                           setState(() {
-                            //update the checkboxes list
+                            // Update the checkboxes list to reflect the new value
                             checkboxesSelected[i] = value!;
                           });
                       } ,),
@@ -190,10 +177,8 @@ class _BookingPageState extends State<BookingPage> {
             }
           } 
           ,),
-          
-          
         ],
-        ),
+      ),
     );
   }
 }

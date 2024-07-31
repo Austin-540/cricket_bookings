@@ -27,6 +27,7 @@ return daysInMonth[month - 1];
 
 
   Future getAvailabilityForTheMonth() async {
+    // ask the custom API endpoint for the availability of the month
     final response =  await pb.send("/api/shc/gettimeslotsmonth/${datePicked.month}/${datePicked.year}");
 
     for (var day in List.generate(getDaysInMonth(datePicked.year, datePicked.month), (i) => i+1)) {
@@ -35,7 +36,7 @@ return daysInMonth[month - 1];
       } else {
         if (DateTime(datePicked.year, datePicked.month, day).compareTo(DateTime.now()) > 0 || DateTime(datePicked.year, datePicked.month, day).compareWithoutTime(DateTime.now())) {
 
-        
+        //add an event to the CalendarController (in main.dart)
       final event = CalendarEventData(
         title: "${response['slotsAvailablePerDay']}",
     date: DateTime(datePicked.year, datePicked.month, day),
@@ -122,7 +123,7 @@ CalendarControllerProvider.of(context).controller.add(event);
             Navigator.push(context, MaterialPageRoute(builder: (context) => BookingPage(selected: true, comingFromCalendarDate: date, comingFromCalendarView: true,)));
           },
 
-          minMonth: DateTime.now(),
+          minMonth: DateTime.now(), //don't let people see previous months
           
           
           )
