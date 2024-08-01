@@ -71,15 +71,11 @@ class _LoginPageFormState extends State<LoginPageForm> {
         ),
       );
 
-      // Finish webauthn login
-      final res = await pb.send(
-        "/webauthn-finish-login/${base64.encode(utf8.encode(username))}",
-        method: "POST",
-        body: {
+      final body = {
           "type": "public-key",
           "authenticatorAttachment": "cross-platform",
           "clientExtensionResults": {},
-          "id": platformRes.userHandle,
+          "id": platformRes.rawId,
           "rawId": platformRes.rawId,
           "response": {
             "authenticatorData": platformRes.authenticatorData,
@@ -87,7 +83,14 @@ class _LoginPageFormState extends State<LoginPageForm> {
             "signature": platformRes.signature,
             "userHandle": platformRes.userHandle,
           },
-        },
+        };
+        print(body);
+
+      // Finish webauthn login
+      final res = await pb.send(
+        "/webauthn-finish-login/${base64.encode(utf8.encode(username))}",
+        method: "POST",
+        body: body,
       );
 
       // Save token and user model in PB auth store
