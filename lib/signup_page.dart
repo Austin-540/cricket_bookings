@@ -191,7 +191,7 @@ class _SignupPageFormState extends State<SignupPageForm> {
             )),
             const Padding(
               padding: EdgeInsets.all(15.0),
-              child: kIsWeb? Text("It is recommended that you save your passkey to your phone so that you can login on all your devices.",
+              child: kIsWeb? Text("It is recommended that you save your passkey to your phone so that you can login on all your devices.\n\nWe don't have access to your screen lock or fingerprint or face scan.",
               textAlign: TextAlign.center,):null,
             )
         ],
