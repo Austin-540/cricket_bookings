@@ -174,7 +174,7 @@ class _HomePagePageState extends State<HomePagePage> {
       final resultList = await pb.collection('bookings').getList(
   page: 1,
   perPage: 50,
-  filter: 'booker = "${pb.authStore.model.id}"',
+  filter: 'booker ~ "${pb.authStore.model.id}"',
 );
 
     //sort the bookings by start time
@@ -208,7 +208,15 @@ class _HomePagePageState extends State<HomePagePage> {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator(),);
             }
-            return Column(children: 
+            return 
+            
+            snapshot.data.length == 0?
+            Center(child: Card(child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text("There's nothing here... Make a new booking in the shopping cart tab."),
+            ),),)
+            :
+            Column(children: 
             [
 
               for (int x = 0; x < snapshot.data.length; x++) ... [
