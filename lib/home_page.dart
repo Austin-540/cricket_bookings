@@ -178,7 +178,7 @@ class _HomePagePageState extends State<HomePagePage> {
 );
 
     //sort the bookings by start time
-  resultList.items.sort((a, b) => a.data['start_time'].compareTo(b.data['start_time']));
+  resultList.items.sort((a, b) => a.data['hour'].compareTo(b.data['hour']));
 
       return resultList.items;
   }
@@ -220,7 +220,7 @@ class _HomePagePageState extends State<HomePagePage> {
             [
 
               for (int x = 0; x < snapshot.data.length; x++) ... [
-                UpcomingBookingCard(time:snapshot.data[x].data['start_time'], bookingDetails: snapshot.data[x],)],
+                UpcomingBookingCard(time:"${snapshot.data[x].data['day']}/${snapshot.data[x].data['month']} at ${snapshot.data[x].data['hour']} (24hr time)", bookingDetails: snapshot.data[x],)],
             ],);
           },
         ),
@@ -243,12 +243,10 @@ class UpcomingBookingCard extends StatefulWidget {
 }
 
 class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
-  DateTime? parsedTime;
 
   @override
   void initState() {
     super.initState();
-    parsedTime= DateTime.parse(widget.time);
     
   }
 
@@ -258,10 +256,9 @@ class _UpcomingBookingCardState extends State<UpcomingBookingCard> {
       padding: const EdgeInsets.all(8.0),
       child: Row(children: [
         //convert the integer month to a string for humans to understand
-        Text("${parsedTime!.day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][parsedTime!.month-1]} ${parsedTime!.year}"),
         const SizedBox(width: 30,),
         //check for PM to turn it into 12hr time
-        Text(parsedTime!.hour<12?"${parsedTime!.hour}:00 AM":"${parsedTime!.hour -12}:00 PM "),
+        Text("${widget.time}"),
         const Spacer(),
         PopupMenuButton(
           onSelected: (item) => showDialog(barrierColor: const Color.fromARGB(51, 253, 17, 0),barrierDismissible: false,context: context, builder: (context) => CancelBookingDialog(details: widget.bookingDetails)),

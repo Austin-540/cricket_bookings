@@ -68,7 +68,7 @@ class _AccountPageState extends State<AccountPage> {
                           right: BorderSide(width: 3),
                         )
                       ),
-                      child: SvgPicture.network(snapshot.data.data['pfp'])),
+                      child: SvgPicture.network(snapshot.data.data['pfp'], height: 150, width: 150, placeholderBuilder: (context) => SizedBox(height: 150, width:150, child: Text("Your profile picture will be here soon :)")),)),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),

@@ -104,8 +104,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
               }
 
               for (final timeslot in widget.timeslots) {
-                await pb.send("/api/shc/make_a_booking/${timeintToDateTime(timeslot['start_time'], widget.date, timeslot['am_or_pm']).toIso8601String()}/${timeintToDateTime(timeslot['end_time'], widget.date, timeslot['am_or_pm']).toIso8601String()}",
-                method: "POST"); // Make a booking request to the custom API endpoint
+                if (timeslot['am_or_pm'] == "PM") {
+                  timeslot['start_time'] += 12;
+                }
+                await pb.send("/api/shc/make_a_booking/${widget.date.year}/${widget.date.month}/${widget.date.day}/${timeslot['start_time']}", method: "POST"); // Make a booking request to the custom API endpoint// Make a booking request to the custom API endpoint
 
                 if (!context.mounted) return;
 

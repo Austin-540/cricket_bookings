@@ -148,6 +148,7 @@ class _BookingPageState extends State<BookingPage> {
                   child: Column(
                     children: [
                       Checkbox(
+                        fillColor: snapshot.data[i]['booked']? WidgetStatePropertyAll(Colors.red[200]) :null,
                         value: checkboxesSelected[i], onChanged: snapshot.data[i]['booked']? null:(value){
                           setState(() {
                             // Update the checkboxes list to reflect the new value
