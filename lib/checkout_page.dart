@@ -67,7 +67,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             Hero(
               tag: "booking_time ${widget.date}",
               child: Material(
-                child: Text("${widget.timeslots[i]['start_time']} - ${widget.timeslots[i]['end_time']} ${widget.timeslots[i]['am_or_pm']}", 
+                child: Text(widget.timeslots[i]['start_time'] > 11?"${widget.timeslots[i]['start_time']-12} PM": "${widget.timeslots[i]['start_time']} AM", 
                 style: const TextStyle(fontSize: 50),),
               ),
             ),

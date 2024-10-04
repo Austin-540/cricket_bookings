@@ -4,12 +4,11 @@ import 'checkout_page.dart';
 
 class TimeSlot {
   // ignore: non_constant_identifier_names
-  TimeSlot({required this.startTime, required this.endTime, required this.booked, required this.am_or_pm});
+  TimeSlot({required this.startTime, required this.endTime, required this.booked});
     final int startTime;
     final int endTime;
     bool booked;
     // ignore: non_constant_identifier_names
-    final String am_or_pm; // either "AM" or "PM" or "Noon"
 
 }
 
@@ -73,8 +72,7 @@ class _BookingPageState extends State<BookingPage> {
       List pbSlots = pbJSON['slots'];
 
       pbSlots.sort((a, b) => a['start_time'].compareTo(b['start_time']));
-      pbSlots.sort((a, b) => a['am_or_pm'].compareTo(b['am_or_pm']));
-      // Sort the timeslots by start_time then am_or_pm, resulting in an overall sort of earliest to latest
+      // Sort the timeslots by start_time, resulting in an overall sort of earliest to latest
 
       setState(() {
         widget.loadingAfterDateChange = false;
@@ -141,7 +139,7 @@ class _BookingPageState extends State<BookingPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(children: [
-                Text("${snapshot.data[i]['start_time']} - ${snapshot.data[i]['end_time']} ${snapshot.data[i]['am_or_pm']}", style: const TextStyle(fontSize: 40),),
+                Text(snapshot.data[i]['start_time'] > 11?"${snapshot.data[i]['start_time']-12} PM": "${snapshot.data[i]['start_time']} AM", style: const TextStyle(fontSize: 40),),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(12.0),

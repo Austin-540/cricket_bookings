@@ -8,7 +8,7 @@ routerAdd("GET", "/api/shc/gettimeslots/:day/:month/:year", (c) => {
     console.log("Looking for:" + day + " " + month + " " + year)
     const timeslots_list = $app.dao().findRecordsByFilter(
         "timeslots",                                    // collection
-        "am_or_pm != 'iurwghur5ehreiu5ih98hiuhsk'", // filter
+        "start_time != 90876854", // filter
         "-created",                                   // sort
         250,                                            // limit
         0,                                             // offset                         // optional filter params
