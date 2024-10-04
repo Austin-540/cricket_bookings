@@ -26,4 +26,4 @@ routerAdd("POST", "/api/shc/admin/make_new_topup_code", (c) => {
 
 
     return c.json(200, { "code": full_code})
-}, $apis.requireAdminAuth(), $apis.activityLogger($app))
+}, $apis.activityLogger($app))

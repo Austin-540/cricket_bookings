@@ -14,27 +14,22 @@ routerAdd("GET", "/api/shc/gettimeslots/:day/:month/:year", (c) => {
         0,                                             // offset                         // optional filter params
     )
 
-    const booked_slots = $app.dao().findRecordsByFilter(
+    console.log("filering by: " )
+    console.log(`year = ${year} && month = ${monthNum} && day = ${day}`)
+
+    const day_booked_slots_db = $app.dao().findRecordsByFilter(
         "bookings",                                    // collection
-        "finished = false", // filter
+        `year = ${year} && month = ${monthNum} && day = ${day}`, // filter
         "-created",                                   // sort
         999,                                            // limit
         0                                             // offse                          // optional filter params
     )
 
-    let day_booked_slots = []
-
-    for (const element of booked_slots) {
-        if (element.getDateTime("start_time").time().day().toString() == day) {
-            if (element.getDateTime("start_time").time().month().toString() == month) {
-                if (element.getDateTime("start_time").time().year().toString() == year) {
-                    console.log("fully valid day found")
-                    day_booked_slots.push(element.getDateTime("start_time").time().hour())
-                }
-            }
-        }
-
+    const day_booked_slots = []
+    for (var element of day_booked_slots_db) {
+        day_booked_slots.push(element.getInt("hour"))
     }
+
 
 
     let final_list = []
@@ -46,8 +41,8 @@ routerAdd("GET", "/api/shc/gettimeslots/:day/:month/:year", (c) => {
         console.log("looking for " + element.getInt("start_time") + "in " + day_booked_slots.toString())
         if (day_booked_slots.includes(element.getInt("start_time"))) {
             final_list.push({
-                "start_time": element.getInt("start_time"),
-                "end_time": element.getInt("end_time"),
+                "start_time": element.getInt("hour"),
+                "end_time": element.getInt("hour") + 1,
                 "booked": true,
                 "am_or_pm": element.getString("am_or_pm")
             })

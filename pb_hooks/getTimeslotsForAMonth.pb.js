@@ -15,8 +15,8 @@ routerAdd("GET", "/api/shc/gettimeslotsmonth/:month/:year", (c) => {
 
     const all_booked_slots = $app.dao().findRecordsByFilter(
         "bookings",                                    // collection
-        "finished = false", // filter
-        "-start_time",                                   // sort
+        `year = ${year} && month = ${monthNum}`, // filter
+        "-created",                                   // sort
         9990,                                            // limit
         0                                             // offse                          // optional filter params
     )
@@ -26,7 +26,7 @@ routerAdd("GET", "/api/shc/gettimeslotsmonth/:month/:year", (c) => {
         //Only show the timeslots from this month
     for (const booked_slot of all_booked_slots) {
         console.log(`Looking for: ${booked_slot.getDateTime("start_time").time().month()} == ${month} ___ time: ${booked_slot.getDateTime("start_time").time().day()}`)
-        if (booked_slot.getDateTime("start_time").time().month().string() == month && booked_slot.getDateTime("start_time").time().year() == year) {
+        if (true) {
            month_booked_slots.push(booked_slot)
             console.log(JSON.stringify(booked_slot))
             console.log("Found")
@@ -40,12 +40,12 @@ routerAdd("GET", "/api/shc/gettimeslotsmonth/:month/:year", (c) => {
     let slotsMap = {};
 
     for (const slot of month_booked_slots) {
-        var relevantPartOfSlotsMap = slotsMap[`${slot.getDateTime("start_time").time().day()}`]
+        var relevantPartOfSlotsMap = slotsMap[`${slot.getInt("day")}`]
         console.log(JSON.stringify(relevantPartOfSlotsMap))
-        if (slotsMap[`${slot.getDateTime("start_time").time().day()}`] != undefined) {
-            slotsMap[`${slot.getDateTime("start_time").time().day()}`] = [...relevantPartOfSlotsMap, slot]
+        if (slotsMap[`${slot.getInt("day")}`] != undefined) {
+            slotsMap[`${slot.getInt("day")}`] = [...relevantPartOfSlotsMap, slot]
         } else {
-            slotsMap[`${slot.getDateTime("start_time").time().day()}`] = [slot]
+            slotsMap[`${slot.getInt('day')}`] = [slot]
         }
     }
 

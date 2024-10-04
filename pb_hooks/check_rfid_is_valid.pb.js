@@ -1,4 +1,5 @@
-routerAdd("GET", "/api/shc/check_rfid_card_is_valid/", (c) => {
+routerAdd("POST", "/api/shc/check_rfid_card_is_valid", (c) => {
+    console.log("we're checking if a door card is valid")
     const requesterInfo = $apis.requestInfo(c)
     const requesterPermissionsRel = requesterInfo.authRecord.get("permissions")
     const requesterPermissions = $app.dao().findRecordById("permissions", requesterPermissionsRel)
@@ -27,3 +28,4 @@ routerAdd("GET", "/api/shc/check_rfid_card_is_valid/", (c) => {
 
     
 }, /* optional middlewares */)
+
