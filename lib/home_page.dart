@@ -178,8 +178,13 @@ class _HomePagePageState extends State<HomePagePage> {
 );
 
     //sort the bookings by start time
-  resultList.items.sort((a, b) => a.data['hour'].compareTo(b.data['hour']));
-
+  resultList.items.sort((a, b) {
+    int monthComparison = a.data['month'].compareTo(b.data['month']);
+    if (monthComparison != 0) return monthComparison;
+    int dayComparison = a.data['day'].compareTo(b.data['day']);
+    if (dayComparison != 0) return dayComparison;
+    return a.data['hour'].compareTo(b.data['hour']);
+  });
       return resultList.items;
   }
 
@@ -190,6 +195,12 @@ class _HomePagePageState extends State<HomePagePage> {
 
     upcomingBookings = getUpcomingBookings();
   }
+  String _formatTime(int hour) {
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final formattedHour = hour % 12 == 0 ? 12 : hour % 12;
+    return '$formattedHour:00 $period';
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!widget.selected) {
@@ -219,8 +230,12 @@ class _HomePagePageState extends State<HomePagePage> {
             Column(children: 
             [
 
-              for (int x = 0; x < snapshot.data.length; x++) ... [
-                UpcomingBookingCard(time:"${snapshot.data[x].data['day']}/${snapshot.data[x].data['month']} at ${snapshot.data[x].data['hour']} (24hr time)", bookingDetails: snapshot.data[x],)],
+                for (int x = 0; x < snapshot.data.length; x++) ... [
+                UpcomingBookingCard(
+                  time: "${snapshot.data[x].data['day']}/${snapshot.data[x].data['month']} at ${_formatTime(snapshot.data[x].data['hour'])}",
+                  bookingDetails: snapshot.data[x],
+                )
+                ],
             ],);
           },
         ),

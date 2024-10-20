@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
       body: Column(children: [
         Padding(
           padding: EdgeInsets.all(8.0),
-          child: Center(child: SizedBox(height: 150, width: 150,child: Placeholder(),)),
+          child: Center(child: SizedBox(height: 150, width: 150,child: Image.network("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsacredheart.ibcdn.nz%2Fmedia%2F2021_10_13_crest-4x4.jpg&f=1&nofb=1&ipt=9cff44c61eec55e45fd440e3714faa23e37f26dc22b61562663115441d7b73ef&ipo=images"),)),
         ),
         LoginPageForm(defaultEmail: defaultEmail,),
         OutlinedButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage())), child: Text("Make an account"))

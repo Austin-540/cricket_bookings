@@ -1,7 +1,7 @@
 import 'package:pocketbase/pocketbase.dart';
 import 'package:flutter/material.dart';
 
-final pb = PocketBase("https://pb.shccricket.com/");
+final pb = PocketBase("http://localhost:8090/");
 
 
 class ErrorDialog extends StatelessWidget {
