@@ -41,31 +41,22 @@ routerAdd("GET", "/api/shc/gettimeslots/:day/:month/:year", (c) => {
         console.log("looking for " + element.getInt("start_time") + "in " + day_booked_slots.toString())
         if (day_booked_slots.includes(element.getInt("start_time"))) {
             final_list.push({
-                "start_time": element.getInt("hour"),
-                "end_time": element.getInt("hour") + 1,
+                "start_time": element.getInt("start_time"),
+                "end_time": element.getInt("start_time") + 1,
                 "booked": true,
-                "am_or_pm": element.getString("am_or_pm")
+                "am_or_pm": element.getInt("hour") >= 12? "PM": "AM"
             })
 
         } else {
             console.log("running else...")
             final_list.push({
                 "start_time": element.getInt("start_time"),
-                "end_time": element.getInt("end_time"),
                 "booked": false,
-                "am_or_pm": element.getString("am_or_pm")
             })
         }
     }
-    let final_final_list = []
-    for (let element of final_list) {
-        if (element.start_time > 12) {
-            element.start_time = element.start_time - 12
-            }
-        final_final_list.push(element)
-    }
 
 
-    return c.json(200, { "slots": final_final_list },)
+    return c.json(200, { "slots": final_list },)
 
 }, $apis.activityLogger($app))
